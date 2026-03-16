@@ -13,13 +13,14 @@
   --text:#f0ede6;--text2:#8a8680;--text3:#4a4845;
 }
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
-.center-box{text-align:center;max-width:440px}
+.center-box{text-align:center;max-width:460px}
 .spinner{width:40px;height:40px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 20px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.center-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:8px}
-.center-sub{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px}
+.center-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:10px}
+.center-sub{font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:20px;white-space:pre-line}
 .btn{background:none;border:1px solid var(--border);color:var(--text2);font-family:'Outfit',sans-serif;font-size:13px;padding:9px 22px;border-radius:8px;cursor:pointer;transition:all .2s;margin:4px}
-.btn:hover,.btn.active{border-color:var(--accent);color:var(--accent)}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.err-code{font-family:'Courier New',monospace;font-size:11px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin:12px 0;text-align:left;color:var(--text2);line-height:1.7}
 
 #viewer{display:none;width:100%;max-width:940px}
 .topbar{display:flex;align-items:center;gap:12px;padding:0 0 16px;border-bottom:1px solid var(--border);margin-bottom:20px;flex-wrap:wrap}
@@ -33,11 +34,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .stat-lbl{font-size:10px;color:var(--text2);margin-top:1px}
 
 .layout{display:flex;gap:16px;align-items:flex-start}
-.canvas-wrap{flex:1;background:var(--bg2);border-radius:14px;border:1px solid var(--border);overflow:hidden;min-width:0;position:relative}
+.canvas-wrap{flex:1;background:var(--bg2);border-radius:14px;border:1px solid var(--border);overflow:hidden;min-width:0}
 canvas{display:block;width:100%;cursor:pointer}
 
 .panel{width:260px;flex-shrink:0;display:flex;flex-direction:column;gap:12px}
-.info-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;min-height:180px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.info-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;min-height:180px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;transition:all .2s}
 .info-card.has-data{align-items:flex-start;text-align:left;justify-content:flex-start}
 .idle-hint{font-size:12px;color:var(--text3);line-height:1.7}
 .room-accent-bar{width:36px;height:4px;border-radius:2px;margin-bottom:12px;flex-shrink:0}
@@ -73,6 +74,7 @@ canvas{display:block;width:100%;cursor:pointer}
   <div style="font-size:36px;margin-bottom:16px">⚠️</div>
   <div class="center-title" id="err-title">Xatolik</div>
   <div class="center-sub" id="err-msg"></div>
+  <div id="err-detail" class="err-code" style="display:none"></div>
   <button class="btn" onclick="location.reload()">Qayta urinish</button>
 </div>
 
@@ -109,15 +111,20 @@ const dpr=devicePixelRatio||1;
 const cv=document.getElementById('cv');
 const ctx=cv.getContext('2d');
 
-// ---- SCREEN ----
+// ---- SCREENS ----
 function showScreen(id){
   ['screen-loading','screen-error','viewer'].forEach(s=>{
     document.getElementById(s).style.display=s===id?(s==='viewer'?'block':'flex'):'none';
   });
 }
-function showError(t,m){
-  document.getElementById('err-title').textContent=t;
-  document.getElementById('err-msg').textContent=m;
+
+// FIX 2: Aniqroq xato xabarlari
+function showError(title, msg, detail=''){
+  document.getElementById('err-title').textContent=title;
+  document.getElementById('err-msg').textContent=msg;
+  const det=document.getElementById('err-detail');
+  if(detail){det.textContent=detail;det.style.display='block';}
+  else det.style.display='none';
   showScreen('screen-error');
 }
 
@@ -125,52 +132,85 @@ function showError(t,m){
 async function init(){
   const id=new URLSearchParams(location.search).get('id');
   if(!id){
-    showError("ID ko'rsatilmagan",
-      "To'g'ri URL:\nloyihalash.vercel.app/?id=abdullayev-047");
+    showError(
+      "Loyiha ID si ko'rsatilmagan",
+      "URL da ?id= parametri bo'lishi kerak.\n\nMisol:",
+      "loyihalash.vercel.app/?id=abdullayev-047\nloyihalash.vercel.app/?id=karimov-048"
+    );
     return;
   }
-  document.getElementById('loading-msg').textContent='Loyihalar ro\'yxati yuklanmoqda...';
 
-  // 1. projects.json dan URL ni olish
-  let firebaseUrl='';
+  // 1. manifest.json dan loyiha ma'lumotini olish
+  document.getElementById('loading-msg').textContent='Loyihalar ro\'yxati yuklanmoqda...';
+  let project=null;
   try{
-    const pRes=await fetch('/projects.json');
-    if(!pRes.ok) throw new Error('projects.json topilmadi');
-    const projects=await pRes.json();
-    firebaseUrl=projects[id];
-    if(!firebaseUrl) throw new Error('"'+id+'" projects.json da yo\'q.\nMavjud ID lar: '+Object.keys(projects).join(', '));
+    const res=await fetch('/manifest.json');
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const manifest=await res.json();
+    project=manifest[id];
+
+    // FIX 1: Mavjud ID larni ko'rsatish
+    if(!project){
+      const available=Object.keys(manifest).join('\n');
+      showError(
+        '"'+id+'" topilmadi',
+        'Bu ID manifest.json da yo\'q.\n\nMavjud loyihalar:',
+        available
+      );
+      return;
+    }
   }catch(e){
-    showError('projects.json xatosi', e.message);
+    showError(
+      'manifest.json yuklanmadi',
+      'GitHub repoda manifest.json fayli yo\'q yoki noto\'g\'ri formatda.',
+      'Xato: '+e.message
+    );
     return;
   }
 
   // 2. Firebase dan data.json olish
-  document.getElementById('loading-msg').textContent='"'+id+'" ma\'lumotlari yuklanmoqda...';
+  document.getElementById('loading-msg').textContent='"'+(project.name||id)+'" yuklanmoqda...';
   try{
-    const res=await fetch(firebaseUrl);
-    if(!res.ok) throw new Error('Firebase javobi: '+res.status);
+    const res=await fetch(project.url);
+    if(res.status===401||res.status===403){
+      // FIX 2: Ruxsat xatosi aniqroq
+      throw new Error('PERMISSION');
+    }
+    if(!res.ok) throw new Error('HTTP '+res.status);
     const data=await res.json();
-    renderProject(data);
+    renderProject(data, project);
   }catch(e){
-    // Firebase CORS muammo — proxy orqali urinish
-    try{
-      const proxy='https://api.allorigins.win/raw?url='+encodeURIComponent(firebaseUrl);
-      const res2=await fetch(proxy);
-      if(!res2.ok) throw new Error('Proxy ham ishlamadi');
-      const data=await res2.json();
-      renderProject(data);
-    }catch(e2){
-      showError('Firebase yuklanmadi',
-        'Firebase Storage → Rules → quyidagiga o\'zgartiring:\n\nallow read: if true;');
+    if(e.message==='PERMISSION'||e.message==='Failed to fetch'){
+      // Proxy orqali urinish
+      try{
+        const proxy='https://api.allorigins.win/raw?url='+encodeURIComponent(project.url);
+        const res2=await fetch(proxy);
+        if(!res2.ok) throw new Error('proxy_fail');
+        const data=await res2.json();
+        renderProject(data, project);
+        return;
+      }catch(_){}
+      // FIX 2: Aniq va tushunarli xato
+      showError(
+        'Ma\'lumotga kirishda ruxsat muammosi',
+        'Firebase Storage da CORS yoki Rules muammo bor.\n\nQuyidagini tekshiring:',
+        '1. Firebase Console → Storage → Rules\n2. Quyidagiga o\'zgartiring:\n\nallow read: if true;\n\n3. Yoki: Storage → CORS sozlamasi'
+      );
+    } else {
+      showError(
+        'Yuklab bo\'lmadi',
+        'Ma\'lumotlar serverdan kelmadi.',
+        'Xato: '+e.message+'\nURL: '+project.url.slice(0,60)+'...'
+      );
     }
   }
 }
 
 // ---- RENDER ----
-function renderProject(data){
+function renderProject(data, project){
   rooms=data.rooms||[];
-  document.getElementById('proj-name').textContent=data.name||'—';
-  document.getElementById('proj-meta').textContent=data.address||'—';
+  document.getElementById('proj-name').textContent=data.name||project.name||'—';
+  document.getElementById('proj-meta').textContent=data.address||project.address||'—';
   document.getElementById('s-area').textContent=data.totalArea||'—';
   document.getElementById('s-rooms').textContent=rooms.length;
   buildRoomList();
@@ -241,6 +281,15 @@ function draw(){
   [...rooms].sort((a,b)=>(a.gx+a.gy)-(b.gx+b.gy)).forEach(r=>drawRoom(r,r.id===hovered,r.id===selected));
 }
 
+// FIX 3: active class + info-card to'liq reset
+function clearSelection(){
+  selected=null;
+  document.querySelectorAll('.room-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('info-card').className='info-card';
+  document.getElementById('info-card').innerHTML='<div class="idle-hint">Xonaga bosing<br>ma\'lumot ko\'rish uchun</div>';
+  draw();
+}
+
 function selectRoom(id){
   selected=id;
   document.querySelectorAll('.room-item').forEach(el=>el.classList.remove('active'));
@@ -275,7 +324,7 @@ function resizeCanvas(){
     const maxGy=Math.max(...rooms.map(r=>r.gy+r.gh));
     const isoH=(maxGx+maxGy)*UNIT*ISO_Y+WALL_H+UNIT*2;
     OX=W/2;OY=Math.max(60,(H-isoH)/2+20);
-  } else {OX=W/2;OY=60;}
+  } else{OX=W/2;OY=60;}
   draw();
 }
 
@@ -283,32 +332,46 @@ function getPos(e){
   const rect=cv.getBoundingClientRect();const t=e.touches?e.touches[0]:e;
   return{x:t.clientX-rect.left,y:t.clientY-rect.top};
 }
+
+// FIX 4: hit test floor + top face ham tekshiriladi
 function hitTest(px,py){
   for(let i=rooms.length-1;i>=0;i--){
     const r=rooms[i];
-    const pts=[toIso(r.gx,r.gy),toIso(r.gx+r.gw,r.gy),toIso(r.gx+r.gw,r.gy+r.gh),toIso(r.gx,r.gy+r.gh)];
-    let inside=false;
-    for(let a=0,b=pts.length-1;a<pts.length;b=a++){
-      const xi=pts[a].x,yi=pts[a].y,xj=pts[b].x,yj=pts[b].y;
-      if(((yi>py)!=(yj>py))&&(px<(xj-xi)*(py-yi)/(yj-yi)+xi))inside=!inside;
-    }
-    if(inside)return r.id;
+    // Floor polygon
+    const fp=[toIso(r.gx,r.gy),toIso(r.gx+r.gw,r.gy),toIso(r.gx+r.gw,r.gy+r.gh),toIso(r.gx,r.gy+r.gh)];
+    // Top face (WALL_H yuqorida)
+    const lift=r.id===selected?7:0;
+    const tp=fp.map(p=>({x:p.x,y:p.y-lift-WALL_H}));
+    if(polyHit(px,py,fp)||polyHit(px,py,tp)) return r.id;
   }
   return null;
 }
-cv.addEventListener('mousemove',e=>{const{x,y}=getPos(e);const h=hitTest(x,y);if(h!==hovered){hovered=h;draw();}cv.style.cursor=h?'pointer':'default';});
+
+function polyHit(px,py,pts){
+  let inside=false;
+  for(let a=0,b=pts.length-1;a<pts.length;b=a++){
+    const xi=pts[a].x,yi=pts[a].y,xj=pts[b].x,yj=pts[b].y;
+    if(((yi>py)!=(yj>py))&&(px<(xj-xi)*(py-yi)/(yj-yi)+xi))inside=!inside;
+  }
+  return inside;
+}
+
+cv.addEventListener('mousemove',e=>{
+  const{x,y}=getPos(e);const h=hitTest(x,y);
+  if(h!==hovered){hovered=h;draw();}
+  cv.style.cursor=h?'pointer':'default';
+});
 cv.addEventListener('mouseleave',()=>{hovered=null;draw();});
 cv.addEventListener('click',e=>{
   const{x,y}=getPos(e);const h=hitTest(x,y);
-  if(h){selectRoom(h);}
-  else{
-    selected=null;
-    document.getElementById('info-card').className='info-card';
-    document.getElementById('info-card').innerHTML='<div class="idle-hint">Xonaga bosing<br>ma\'lumot ko\'rish uchun</div>';
-    draw();
-  }
+  if(h) selectRoom(h);
+  else clearSelection(); // FIX 3
 });
-cv.addEventListener('touchstart',e=>{e.preventDefault();const{x,y}=getPos(e);const h=hitTest(x,y);if(h)selectRoom(h);},{passive:false});
+cv.addEventListener('touchstart',e=>{
+  e.preventDefault();const{x,y}=getPos(e);const h=hitTest(x,y);
+  if(h) selectRoom(h);
+  else clearSelection();
+},{passive:false});
 window.addEventListener('resize',resizeCanvas);
 init();
 </script>
