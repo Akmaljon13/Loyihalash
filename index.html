@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ArchView — Uy Rejasi</title>
+<title>ArchView</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -19,8 +19,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .center-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:8px}
 .center-sub{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px}
 .btn{background:none;border:1px solid var(--border);color:var(--text2);font-family:'Outfit',sans-serif;font-size:13px;padding:9px 22px;border-radius:8px;cursor:pointer;transition:all .2s;margin:4px}
-.btn:hover{border-color:var(--accent);color:var(--accent)}
-.btn.primary{border-color:var(--accent);color:var(--accent)}
+.btn:hover,.btn.active{border-color:var(--accent);color:var(--accent)}
 
 #viewer{display:none;width:100%;max-width:940px}
 .topbar{display:flex;align-items:center;gap:12px;padding:0 0 16px;border-bottom:1px solid var(--border);margin-bottom:20px;flex-wrap:wrap}
@@ -59,8 +58,6 @@ canvas{display:block;width:100%;cursor:pointer}
 .room-item-name{font-size:13px;font-weight:500;flex:1}
 .room-item-area{font-size:11px;color:var(--accent)}
 
-.tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(232,201,122,.1);color:var(--accent);border:1px solid rgba(232,201,122,.2);margin-bottom:8px}
-
 @media(max-width:660px){.layout{flex-direction:column}.panel{width:100%}.stats{display:none}}
 </style>
 </head>
@@ -76,10 +73,7 @@ canvas{display:block;width:100%;cursor:pointer}
   <div style="font-size:36px;margin-bottom:16px">⚠️</div>
   <div class="center-title" id="err-title">Xatolik</div>
   <div class="center-sub" id="err-msg"></div>
-  <div>
-    <button class="btn primary" onclick="location.reload()">Qayta urinish</button>
-    <button class="btn" onclick="showScreen('screen-loading');tryProxy()">Proxy orqali urinish</button>
-  </div>
+  <button class="btn" onclick="location.reload()">Qayta urinish</button>
 </div>
 
 <div id="viewer">
@@ -95,9 +89,7 @@ canvas{display:block;width:100%;cursor:pointer}
     </div>
   </div>
   <div class="layout">
-    <div class="canvas-wrap">
-      <canvas id="cv"></canvas>
-    </div>
+    <div class="canvas-wrap"><canvas id="cv"></canvas></div>
     <div class="panel">
       <div class="info-card" id="info-card">
         <div class="idle-hint">Xonaga bosing<br>ma'lumot ko'rish uchun</div>
@@ -111,70 +103,16 @@ canvas{display:block;width:100%;cursor:pointer}
 </div>
 
 <script>
-// ================================================================
-// LOYIHALAR — Firebase to'g'ridan-to'g'ri URL lar
-// ================================================================
-const PROJECTS = {
-  'abdullayev-047': 'https://firebasestorage.googleapis.com/v0/b/agrosuv-a2a3a.firebasestorage.app/o/autocad%2Fabdullayev%20-047%2Fdata.json?alt=media&token=49f752f8-82be-4171-a9dd-66ba925a31fb',
-  'karimov-048':    'https://firebasestorage.googleapis.com/v0/b/agrosuv-a2a3a.firebasestorage.app/o/autocad%2Fkarimov-048%2Fdata.json?alt=media&token=eac7ea97-d224-4842-b49f-a5aed0719652'
-};
-// Yangi mijoz: 'rahimov-049': 'firebase url...'
-// ================================================================
-
-// DEMO data — Firebase ishlamasa shu ko'rinadi
-const DEMO = {
-  'abdullayev-047': {
-    name:'Abdullayev oilasi uyi', address:'Toshkent viloyati · Loyiha №047',
-    totalArea:'72.0 m²', roomCount:4,
-    rooms:[
-      {id:'mehmon',name:'Mehmonxona',type:'Yashash xonasi',area:'20.4 m²',size:'4.8×4.3m',windows:'3 ta',doors:'1 ta',
-       desc:"Janubiy-g'arbiy tarafga qaragan asosiy yashash xonasi.",
-       color:'#e8c97a',floor:'#c8a870',wallTop:'#d4b896',wallLeft:'#b89a78',wallRight:'#a08060',gx:0,gy:0,gw:3,gh:3},
-      {id:'yotoq1',name:'Yotoqxona 1',type:'Ota-ona xonasi',area:'19.2 m²',size:'4.0×4.8m',windows:'3 ta',doors:'1 ta',
-       desc:'Shimoliy-sharqiy tomondan joylashgan katta yotoqxona.',
-       color:'#56b4d3',floor:'#7090a8',wallTop:'#8ab4c8',wallLeft:'#6898b0',wallRight:'#507898',gx:3,gy:0,gw:3,gh:3},
-      {id:'yotoq2',name:'Yotoqxona 2',type:'Bolalar xonasi',area:'14.8 m²',size:'3.6×4.1m',windows:'2 ta',doors:'1 ta',
-       desc:"G'arbiy tarafda bolalar uchun qulay xona.",
-       color:'#6fcf97',floor:'#78b088',wallTop:'#8ec89a',wallLeft:'#70aa80',wallRight:'#589068',gx:0,gy:3,gw:3,gh:2.5},
-      {id:'oshxona',name:'Oshxona',type:'Oshxona',area:'11.0 m²',size:'2.7×4.1m',windows:'1 ta',doors:'1 ta',
-       desc:"L-shaklidagi garnitur. 4 kishilik stol.",
-       color:'#eb9c56',floor:'#c89860',wallTop:'#d4a878',wallLeft:'#b88858',wallRight:'#a07040',gx:3,gy:3,gw:3,gh:2.5}
-    ]
-  },
-  'karimov-048': {
-    name:'Karimov oilasi uyi', address:'Samarqand shahri · Loyiha №048',
-    totalArea:'95.0 m²', roomCount:5,
-    rooms:[
-      {id:'mehmon',name:'Mehmonxona',type:'Yashash xonasi',area:'26.0 m²',size:'5.2×5.0m',windows:'4 ta',doors:'2 ta',
-       desc:'Katta va yorug\' mehmonxona.',
-       color:'#c084fc',floor:'#9060c0',wallTop:'#b090d8',wallLeft:'#9070c0',wallRight:'#7850a8',gx:0,gy:0,gw:3.5,gh:3.5},
-      {id:'yotoq1',name:'Yotoqxona 1',type:'Ota-ona xonasi',area:'22.0 m²',size:'4.4×5.0m',windows:'2 ta',doors:'1 ta',
-       desc:'Alohida kiyinish xonasi bilan.',
-       color:'#f87171',floor:'#c05050',wallTop:'#d87070',wallLeft:'#c05858',wallRight:'#a84040',gx:3.5,gy:0,gw:3,gh:3.5},
-      {id:'yotoq2',name:'Yotoqxona 2',type:'Bolalar xonasi',area:'16.0 m²',size:'3.2×5.0m',windows:'2 ta',doors:'1 ta',
-       desc:'Ikki bolaga mo\'ljallangan.',
-       color:'#34d399',floor:'#208860',wallTop:'#30a878',wallLeft:'#208860',wallRight:'#187048',gx:0,gy:3.5,gw:2.5,gh:3},
-      {id:'oshxona',name:'Oshxona',type:'Oshxona',area:'18.0 m²',size:'3.6×5.0m',windows:'2 ta',doors:'1 ta',
-       desc:'6 kishilik stol. Keng garnitur.',
-       color:'#fbbf24',floor:'#c08820',wallTop:'#d8a840',wallLeft:'#c09030',wallRight:'#a87020',gx:2.5,gy:3.5,gw:2.5,gh:3},
-      {id:'kabinet',name:'Kabinet',type:'Ish xonasi',area:'13.0 m²',size:'2.6×5.0m',windows:'1 ta',doors:'1 ta',
-       desc:'Uy-ofis. Kitoblar javoni va ish stoli.',
-       color:'#60a5fa',floor:'#3060a0',wallTop:'#5080c0',wallLeft:'#4070b0',wallRight:'#305898',gx:5,gy:3.5,gw:1.5,gh:3}
-    ]
-  }
-};
-
-// ================================================================
-let rooms=[], hovered=null, selected=null;
+const UNIT=55,ISO_X=0.866,ISO_Y=0.5,WALL_H=38;
+let OX=300,OY=70,rooms=[],hovered=null,selected=null;
 const dpr=devicePixelRatio||1;
 const cv=document.getElementById('cv');
 const ctx=cv.getContext('2d');
-let currentId='';
 
+// ---- SCREEN ----
 function showScreen(id){
   ['screen-loading','screen-error','viewer'].forEach(s=>{
-    const el=document.getElementById(s);
-    el.style.display=s===id?(s==='viewer'?'block':'flex'):'none';
+    document.getElementById(s).style.display=s===id?(s==='viewer'?'block':'flex'):'none';
   });
 }
 function showError(t,m){
@@ -183,49 +121,56 @@ function showError(t,m){
   showScreen('screen-error');
 }
 
+// ---- INIT ----
 async function init(){
   const id=new URLSearchParams(location.search).get('id');
-  if(!id){showError("ID yo'q","URL: loyihalash.vercel.app/?id=abdullayev-047\n\nYoki: loyihalash.vercel.app/?id=karimov-048");return;}
-  currentId=id;
-  if(!PROJECTS[id]){showError("Topilmadi: "+id,"Mavjud: "+Object.keys(PROJECTS).join(', '));return;}
-  document.getElementById('loading-msg').textContent='"'+id+'" yuklanmoqda...';
+  if(!id){
+    showError("ID ko'rsatilmagan",
+      "To'g'ri URL:\nloyihalash.vercel.app/?id=abdullayev-047");
+    return;
+  }
+  document.getElementById('loading-msg').textContent='Loyihalar ro\'yxati yuklanmoqda...';
 
-  // Firebase dan olishga urinish
-  try {
-    const res=await fetch(PROJECTS[id]);
-    if(!res.ok) throw new Error('status: '+res.status);
+  // 1. projects.json dan URL ni olish
+  let firebaseUrl='';
+  try{
+    const pRes=await fetch('/projects.json');
+    if(!pRes.ok) throw new Error('projects.json topilmadi');
+    const projects=await pRes.json();
+    firebaseUrl=projects[id];
+    if(!firebaseUrl) throw new Error('"'+id+'" projects.json da yo\'q.\nMavjud ID lar: '+Object.keys(projects).join(', '));
+  }catch(e){
+    showError('projects.json xatosi', e.message);
+    return;
+  }
+
+  // 2. Firebase dan data.json olish
+  document.getElementById('loading-msg').textContent='"'+id+'" ma\'lumotlari yuklanmoqda...';
+  try{
+    const res=await fetch(firebaseUrl);
+    if(!res.ok) throw new Error('Firebase javobi: '+res.status);
     const data=await res.json();
-    renderProject(data, false);
-  } catch(e) {
-    // Firebase ishlamasa — demo data ishlatamiz
-    console.warn('Firebase CORS xatosi, demo data ishlatilmoqda:', e.message);
-    const demo=DEMO[id];
-    if(demo) renderProject(demo, true);
-    else showError('Xatolik', e.message);
+    renderProject(data);
+  }catch(e){
+    // Firebase CORS muammo — proxy orqali urinish
+    try{
+      const proxy='https://api.allorigins.win/raw?url='+encodeURIComponent(firebaseUrl);
+      const res2=await fetch(proxy);
+      if(!res2.ok) throw new Error('Proxy ham ishlamadi');
+      const data=await res2.json();
+      renderProject(data);
+    }catch(e2){
+      showError('Firebase yuklanmadi',
+        'Firebase Storage → Rules → quyidagiga o\'zgartiring:\n\nallow read: if true;');
+    }
   }
 }
 
-function tryProxy(){
-  // allorigins proxy orqali urinib ko'rish
-  const id=currentId||new URLSearchParams(location.search).get('id');
-  const orig=PROJECTS[id];
-  if(!orig){showError('ID topilmadi','');return;}
-  document.getElementById('loading-msg').textContent='Proxy orqali urinilmoqda...';
-  const proxyUrl='https://api.allorigins.win/raw?url='+encodeURIComponent(orig);
-  fetch(proxyUrl)
-    .then(r=>{if(!r.ok)throw new Error('Proxy ham ishlamadi');return r.json();})
-    .then(data=>renderProject(data,false))
-    .catch(()=>{
-      const demo=DEMO[id];
-      if(demo) renderProject(demo,true);
-      else showError('Barcha urinishlar muvaffaqiyatsiz','Firebase Storage CORS sozlamalarini tekshiring');
-    });
-}
-
-function renderProject(data, isDemo){
+// ---- RENDER ----
+function renderProject(data){
   rooms=data.rooms||[];
   document.getElementById('proj-name').textContent=data.name||'—';
-  document.getElementById('proj-meta').textContent=(isDemo?'⚠ Demo ma\'lumot  |  ':'')+( data.address||'—');
+  document.getElementById('proj-meta').textContent=data.address||'—';
   document.getElementById('s-area').textContent=data.totalArea||'—';
   document.getElementById('s-rooms').textContent=rooms.length;
   buildRoomList();
@@ -239,16 +184,15 @@ function buildRoomList(){
   rooms.forEach(r=>{
     const el=document.createElement('div');
     el.className='room-item';el.id='li-'+r.id;
-    el.innerHTML=`<div class="room-dot" style="background:${r.color}"></div><div class="room-item-name">${r.name}</div><div class="room-item-area">${r.area}</div>`;
+    el.innerHTML=`<div class="room-dot" style="background:${r.color}"></div>
+      <div class="room-item-name">${r.name}</div>
+      <div class="room-item-area">${r.area}</div>`;
     el.onclick=()=>selectRoom(r.id);
     body.appendChild(el);
   });
 }
 
-// ---- 2D ISO RENDER ----
-const UNIT=55,ISO_X=0.866,ISO_Y=0.5,WALL_H=38;
-let OX=300,OY=70;
-
+// ---- CANVAS ----
 function toIso(gx,gy){return{x:OX+(gx-gy)*UNIT*ISO_X,y:OY+(gx+gy)*UNIT*ISO_Y};}
 
 function drawRoom(r,isHov,isSel){
@@ -257,45 +201,34 @@ function drawRoom(r,isHov,isSel){
   const al=isSel?'ff':isHov?'ee':'bb';
   const P=(x,y)=>toIso(x,y);
   const p00=P(gx,gy),p10=P(gx+gw,gy),p11=P(gx+gw,gy+gh),p01=P(gx,gy+gh);
-
   const poly=(pts,fill,stroke)=>{
-    ctx.beginPath();
-    pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+    ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
     ctx.closePath();ctx.fillStyle=fill;ctx.fill();
     if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke();}
   };
-
   const L=pt=>({x:pt.x,y:pt.y-lift});
   const sc=isSel?r.color:null;
-
-  poly([L(p00),L(p10),L(p11),L(p01)], r.floor+al, sc);
-  poly([L(p01),L(p11),{x:p11.x,y:p11.y-lift+WALL_H},{x:p01.x,y:p01.y-lift+WALL_H}], r.wallLeft+al, sc);
-  poly([L(p10),L(p11),{x:p11.x,y:p11.y-lift+WALL_H},{x:p10.x,y:p10.y-lift+WALL_H}], r.wallRight+al, sc);
+  poly([L(p00),L(p10),L(p11),L(p01)],r.floor+al,sc);
+  poly([L(p01),L(p11),{x:p11.x,y:p11.y-lift+WALL_H},{x:p01.x,y:p01.y-lift+WALL_H}],r.wallLeft+al,sc);
+  poly([L(p10),L(p11),{x:p11.x,y:p11.y-lift+WALL_H},{x:p10.x,y:p10.y-lift+WALL_H}],r.wallRight+al,sc);
   const T=pt=>({x:pt.x,y:pt.y-lift-WALL_H});
-  poly([T(p00),T(p10),T(p11),T(p01)], r.wallTop+al, sc);
-
+  poly([T(p00),T(p10),T(p11),T(p01)],r.wallTop+al,sc);
   [p00,p10,p11,p01].forEach(pt=>{
     ctx.beginPath();ctx.moveTo(pt.x,pt.y-lift-WALL_H);ctx.lineTo(pt.x,pt.y-lift);
     ctx.strokeStyle='rgba(0,0,0,0.22)';ctx.lineWidth=.7;ctx.stroke();
   });
-
-  // deraza
   const w1=toIso(gx+gw*.2,gy),w2=toIso(gx+gw*.8,gy);
   ctx.beginPath();
   ctx.moveTo(w1.x,w1.y-lift-WALL_H*.2);ctx.lineTo(w1.x,w1.y-lift-WALL_H*.8);
   ctx.lineTo(w2.x,w2.y-lift-WALL_H*.8);ctx.lineTo(w2.x,w2.y-lift-WALL_H*.2);
   ctx.strokeStyle='rgba(86,180,211,0.6)';ctx.lineWidth=1.5;ctx.stroke();
   ctx.fillStyle='rgba(86,180,211,0.1)';ctx.fill();
-
   const cx=(p00.x+p10.x+p11.x+p01.x)/4,cy=(p00.y+p10.y+p11.y+p01.y)/4-lift;
-  ctx.save();
-  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
   ctx.font=`600 ${Math.max(9,UNIT*.17)}px Syne,sans-serif`;
-  ctx.fillStyle=isSel?'#fff':'rgba(255,255,255,0.85)';
-  ctx.fillText(r.name,cx,cy-7);
+  ctx.fillStyle=isSel?'#fff':'rgba(255,255,255,0.85)';ctx.fillText(r.name,cx,cy-7);
   ctx.font=`300 ${Math.max(8,UNIT*.14)}px Outfit,sans-serif`;
-  ctx.fillStyle=isSel?r.color:'rgba(255,255,255,0.45)';
-  ctx.fillText(r.area,cx,cy+8);
+  ctx.fillStyle=isSel?r.color:'rgba(255,255,255,0.45)';ctx.fillText(r.area,cx,cy+8);
   ctx.restore();
 }
 
@@ -334,29 +267,20 @@ function resizeCanvas(){
   const wrap=cv.parentElement;
   const W=wrap.clientWidth||600;
   const H=Math.max(320,Math.min(520,W*.7));
-  cv.style.width=W+'px';
-  cv.style.height=H+'px';
-  cv.width=Math.round(W*dpr);
-  cv.height=Math.round(H*dpr);
-  ctx.setTransform(1,0,0,1,0,0);
-  ctx.scale(dpr,dpr);
-  // auto-fit: xonalar markazga kelsin
+  cv.style.width=W+'px';cv.style.height=H+'px';
+  cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
+  ctx.setTransform(1,0,0,1,0,0);ctx.scale(dpr,dpr);
   if(rooms.length){
     const maxGx=Math.max(...rooms.map(r=>r.gx+r.gw));
     const maxGy=Math.max(...rooms.map(r=>r.gy+r.gh));
-    const isoW=(maxGx+maxGy)*UNIT*ISO_X;
     const isoH=(maxGx+maxGy)*UNIT*ISO_Y+WALL_H+UNIT*2;
-    OX=W/2;
-    OY=Math.max(60, (H-isoH)/2+20);
-  } else {
-    OX=W/2; OY=60;
-  }
+    OX=W/2;OY=Math.max(60,(H-isoH)/2+20);
+  } else {OX=W/2;OY=60;}
   draw();
 }
 
 function getPos(e){
-  const rect=cv.getBoundingClientRect();
-  const t=e.touches?e.touches[0]:e;
+  const rect=cv.getBoundingClientRect();const t=e.touches?e.touches[0]:e;
   return{x:t.clientX-rect.left,y:t.clientY-rect.top};
 }
 function hitTest(px,py){
@@ -376,7 +300,7 @@ cv.addEventListener('mousemove',e=>{const{x,y}=getPos(e);const h=hitTest(x,y);if
 cv.addEventListener('mouseleave',()=>{hovered=null;draw();});
 cv.addEventListener('click',e=>{
   const{x,y}=getPos(e);const h=hitTest(x,y);
-  if(h)selectRoom(h);
+  if(h){selectRoom(h);}
   else{
     selected=null;
     document.getElementById('info-card').className='info-card';
