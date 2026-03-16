@@ -331,12 +331,26 @@ function selectRoom(id){
 }
 
 function resizeCanvas(){
-  const W=cv.parentElement.clientWidth;
-  const H=Math.max(300,Math.min(500,W*.65));
-  cv.width=W*dpr;cv.height=H*dpr;
+  const wrap=cv.parentElement;
+  const W=wrap.clientWidth||600;
+  const H=Math.max(320,Math.min(520,W*.7));
+  cv.style.width=W+'px';
   cv.style.height=H+'px';
+  cv.width=Math.round(W*dpr);
+  cv.height=Math.round(H*dpr);
+  ctx.setTransform(1,0,0,1,0,0);
   ctx.scale(dpr,dpr);
-  OX=W/2;OY=50;
+  // auto-fit: xonalar markazga kelsin
+  if(rooms.length){
+    const maxGx=Math.max(...rooms.map(r=>r.gx+r.gw));
+    const maxGy=Math.max(...rooms.map(r=>r.gy+r.gh));
+    const isoW=(maxGx+maxGy)*UNIT*ISO_X;
+    const isoH=(maxGx+maxGy)*UNIT*ISO_Y+WALL_H+UNIT*2;
+    OX=W/2;
+    OY=Math.max(60, (H-isoH)/2+20);
+  } else {
+    OX=W/2; OY=60;
+  }
   draw();
 }
 
