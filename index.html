@@ -9,50 +9,68 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#0e0e0f;--bg2:#161617;--bg3:#1e1e20;
-  --border:#2a2a2e;--accent:#e8c97a;
+  --border:#2a2a2e;
+  --accent:#e8c97a;
   --text:#f0ede6;--text2:#8a8680;--text3:#4a4845;
 }
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+
+/* SCREENS */
 .center-box{text-align:center;max-width:460px}
 .spinner{width:40px;height:40px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 20px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .center-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:10px}
 .center-sub{font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:20px;white-space:pre-line}
-.btn{background:none;border:1px solid var(--border);color:var(--text2);font-family:'Outfit',sans-serif;font-size:13px;padding:9px 22px;border-radius:8px;cursor:pointer;transition:all .2s;margin:4px}
-.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn{background:none;border:1px solid var(--border);color:var(--text2);font-family:'Outfit',sans-serif;font-size:12px;padding:7px 16px;border-radius:8px;cursor:pointer;transition:all .2s;margin:3px}
+.btn:hover,.btn.active{border-color:var(--accent);color:var(--accent);background:rgba(232,201,122,.06)}
 .err-code{font-family:'Courier New',monospace;font-size:11px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin:12px 0;text-align:left;color:var(--text2);line-height:1.7}
 
-#viewer{display:none;width:100%;max-width:940px}
-.topbar{display:flex;align-items:center;gap:12px;padding:0 0 16px;border-bottom:1px solid var(--border);margin-bottom:20px;flex-wrap:wrap}
-.logo{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;color:var(--accent);flex-shrink:0}
+/* VIEWER */
+#viewer{display:none;width:100%;max-width:960px}
+.topbar{display:flex;align-items:center;gap:12px;padding:0 0 14px;border-bottom:1px solid var(--border);margin-bottom:16px;flex-wrap:wrap}
+.brand-logo{height:28px;object-fit:contain;opacity:.9}
+.brand-name{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--accent);flex-shrink:0}
 .proj-info{flex:1;min-width:0}
-.proj-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.proj-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .proj-meta{font-size:11px;color:var(--text2);margin-top:2px}
-.stats{display:flex;gap:10px;flex-shrink:0}
-.stat{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px 14px;text-align:center}
-.stat-val{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--accent)}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap}
+.stats{display:flex;gap:8px}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:7px 12px;text-align:center}
+.stat-val{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--accent)}
 .stat-lbl{font-size:10px;color:var(--text2);margin-top:1px}
 
+/* TOOLBAR: floor tabs + view toggle */
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.floor-tabs{display:flex;gap:6px}
+.floor-tab{background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-family:'Outfit',sans-serif;font-size:12px;padding:6px 14px;border-radius:8px;cursor:pointer;transition:all .2s}
+.floor-tab:hover,.floor-tab.active{border-color:var(--accent);color:var(--accent);background:rgba(232,201,122,.06)}
+.view-toggle{display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:3px}
+.view-btn{background:none;border:none;color:var(--text2);font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;padding:5px 12px;border-radius:7px;cursor:pointer;transition:all .2s;letter-spacing:.5px}
+.view-btn.active{background:var(--bg3);color:var(--accent);border:1px solid rgba(232,201,122,.25)}
+.premium-badge{font-size:10px;padding:3px 8px;border-radius:5px;background:rgba(232,201,122,.12);color:var(--accent);border:1px solid rgba(232,201,122,.25);letter-spacing:.5px;font-weight:500}
+
+/* LAYOUT */
 .layout{display:flex;gap:16px;align-items:flex-start}
 .canvas-wrap{flex:1;background:var(--bg2);border-radius:14px;border:1px solid var(--border);overflow:hidden;min-width:0}
 canvas{display:block;width:100%;cursor:pointer}
 
-.panel{width:260px;flex-shrink:0;display:flex;flex-direction:column;gap:12px}
-.info-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;min-height:180px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;transition:all .2s}
+/* PANEL */
+.panel{width:255px;flex-shrink:0;display:flex;flex-direction:column;gap:12px}
+.info-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;min-height:175px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;transition:border-color .2s}
 .info-card.has-data{align-items:flex-start;text-align:left;justify-content:flex-start}
 .idle-hint{font-size:12px;color:var(--text3);line-height:1.7}
-.room-accent-bar{width:36px;height:4px;border-radius:2px;margin-bottom:12px;flex-shrink:0}
-.room-name-big{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:3px}
-.room-type-sm{font-size:11px;color:var(--text2);margin-bottom:14px}
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-bottom:12px}
-.info-cell{background:var(--bg3);border-radius:8px;padding:8px 10px}
-.info-cell-lbl{font-size:10px;color:var(--text3);letter-spacing:.5px;margin-bottom:3px;text-transform:uppercase}
+.room-accent-bar{width:32px;height:4px;border-radius:2px;margin-bottom:10px;flex-shrink:0}
+.room-name-big{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:3px}
+.room-type-sm{font-size:11px;color:var(--text2);margin-bottom:12px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%;margin-bottom:10px}
+.info-cell{background:var(--bg3);border-radius:8px;padding:7px 9px}
+.info-cell-lbl{font-size:10px;color:var(--text3);letter-spacing:.5px;margin-bottom:2px;text-transform:uppercase}
 .info-cell-val{font-size:13px;font-weight:500}
-.info-desc{font-size:12px;color:var(--text2);line-height:1.6;border-top:1px solid var(--border);padding-top:10px;width:100%}
+.info-desc{font-size:12px;color:var(--text2);line-height:1.6;border-top:1px solid var(--border);padding-top:9px;width:100%}
 
 .room-list{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden}
-.rl-title{font-size:10px;color:var(--text3);letter-spacing:1px;padding:12px 14px 8px;text-transform:uppercase;font-weight:500}
-.room-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:background .15s;border-top:1px solid var(--border)}
+.rl-title{font-size:10px;color:var(--text3);letter-spacing:1px;padding:11px 14px 7px;text-transform:uppercase;font-weight:500}
+.room-item{display:flex;align-items:center;gap:9px;padding:9px 14px;cursor:pointer;transition:background .15s;border-top:1px solid var(--border)}
 .room-item:hover{background:var(--bg3)}
 .room-item.active{background:rgba(232,201,122,.07);border-left:2px solid var(--accent)}
 .room-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
@@ -71,7 +89,7 @@ canvas{display:block;width:100%;cursor:pointer}
 </div>
 
 <div class="center-box" id="screen-error" style="display:none">
-  <div style="font-size:36px;margin-bottom:16px">⚠️</div>
+  <div style="font-size:36px;margin-bottom:14px">⚠️</div>
   <div class="center-title" id="err-title">Xatolik</div>
   <div class="center-sub" id="err-msg"></div>
   <div id="err-detail" class="err-code" style="display:none"></div>
@@ -80,16 +98,32 @@ canvas{display:block;width:100%;cursor:pointer}
 
 <div id="viewer">
   <div class="topbar">
-    <div class="logo">ARCHVIEW</div>
+    <img id="brand-logo" class="brand-logo" src="" style="display:none" alt="logo">
+    <div class="brand-name" id="brand-name">ARCHVIEW</div>
     <div class="proj-info">
       <div class="proj-name" id="proj-name">—</div>
       <div class="proj-meta" id="proj-meta">—</div>
     </div>
-    <div class="stats">
-      <div class="stat"><div class="stat-val" id="s-area">—</div><div class="stat-lbl">Maydon</div></div>
-      <div class="stat"><div class="stat-val" id="s-rooms">—</div><div class="stat-lbl">Xona</div></div>
+    <div class="topbar-right">
+      <div class="stats">
+        <div class="stat"><div class="stat-val" id="s-area">—</div><div class="stat-lbl">Maydon</div></div>
+        <div class="stat"><div class="stat-val" id="s-rooms">—</div><div class="stat-lbl">Xona</div></div>
+      </div>
     </div>
   </div>
+
+  <!-- TOOLBAR: qavat + ko'rinish -->
+  <div class="toolbar">
+    <div class="floor-tabs" id="floor-tabs"></div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div id="premium-badge" class="premium-badge" style="display:none">PREMIUM</div>
+      <div class="view-toggle" id="view-toggle" style="display:none">
+        <button class="view-btn active" id="btn-25d" onclick="setView('2.5d')">2.5D</button>
+        <button class="view-btn" id="btn-2d" onclick="setView('2d')">2D</button>
+      </div>
+    </div>
+  </div>
+
   <div class="layout">
     <div class="canvas-wrap"><canvas id="cv"></canvas></div>
     <div class="panel">
@@ -97,7 +131,7 @@ canvas{display:block;width:100%;cursor:pointer}
         <div class="idle-hint">Xonaga bosing<br>ma'lumot ko'rish uchun</div>
       </div>
       <div class="room-list">
-        <div class="rl-title">Xonalar</div>
+        <div class="rl-title" id="rl-floor-label">Xonalar</div>
         <div id="room-list-body"></div>
       </div>
     </div>
@@ -105,8 +139,13 @@ canvas{display:block;width:100%;cursor:pointer}
 </div>
 
 <script>
-const UNIT=55,ISO_X=0.866,ISO_Y=0.5,WALL_H=38;
-let OX=300,OY=70,rooms=[],hovered=null,selected=null;
+// ================================================================
+const UNIT=55, ISO_X=0.866, ISO_Y=0.5, WALL_H=38;
+let OX=300, OY=70;
+let allFloors=[], currentFloorIdx=0, rooms=[];
+let hovered=null, selected=null;
+let viewMode='2.5d'; // '2.5d' | '2d'
+let isPremium=false;
 const dpr=devicePixelRatio||1;
 const cv=document.getElementById('cv');
 const ctx=cv.getContext('2d');
@@ -117,9 +156,7 @@ function showScreen(id){
     document.getElementById(s).style.display=s===id?(s==='viewer'?'block':'flex'):'none';
   });
 }
-
-// FIX 2: Aniqroq xato xabarlari
-function showError(title, msg, detail=''){
+function showError(title,msg,detail=''){
   document.getElementById('err-title').textContent=title;
   document.getElementById('err-msg').textContent=msg;
   const det=document.getElementById('err-detail');
@@ -131,93 +168,140 @@ function showError(title, msg, detail=''){
 // ---- INIT ----
 async function init(){
   const id=new URLSearchParams(location.search).get('id');
-  if(!id){
-    showError(
-      "Loyiha ID si ko'rsatilmagan",
-      "URL da ?id= parametri bo'lishi kerak.\n\nMisol:",
-      "loyihalash.vercel.app/?id=abdullayev-047\nloyihalash.vercel.app/?id=karimov-048"
-    );
-    return;
-  }
+  if(!id){showError("ID ko'rsatilmagan","URL misoli:","loyihalash.vercel.app/?id=abdullayev-047");return;}
 
-  // 1. manifest.json dan loyiha ma'lumotini olish
-  document.getElementById('loading-msg').textContent='Loyihalar ro\'yxati yuklanmoqda...';
+  document.getElementById('loading-msg').textContent='manifest.json yuklanmoqda...';
   let project=null;
   try{
     const res=await fetch('/manifest.json');
     if(!res.ok) throw new Error('HTTP '+res.status);
     const manifest=await res.json();
     project=manifest[id];
-
-    // FIX 1: Mavjud ID larni ko'rsatish
     if(!project){
-      const available=Object.keys(manifest).join('\n');
-      showError(
-        '"'+id+'" topilmadi',
-        'Bu ID manifest.json da yo\'q.\n\nMavjud loyihalar:',
-        available
-      );
+      showError('"'+id+'" topilmadi','Mavjud loyihalar:',Object.keys(manifest).join('\n'));
       return;
     }
   }catch(e){
-    showError(
-      'manifest.json yuklanmadi',
-      'GitHub repoda manifest.json fayli yo\'q yoki noto\'g\'ri formatda.',
-      'Xato: '+e.message
-    );
+    showError('manifest.json yuklanmadi','GitHub repoda manifest.json yo\'q.','Xato: '+e.message);
     return;
   }
 
-  // 2. Firebase dan data.json olish
-  document.getElementById('loading-msg').textContent='"'+(project.name||id)+'" yuklanmoqda...';
+  // Brand sozlash
+  applyBrand(project);
+  isPremium=project.premium||false;
+
+  document.getElementById('loading-msg').textContent='"'+(project.name)+'" yuklanmoqda...';
+
+  // Firebase dan data.json
   try{
-    const res=await fetch(project.url);
-    if(res.status===401||res.status===403){
-      // FIX 2: Ruxsat xatosi aniqroq
-      throw new Error('PERMISSION');
+    let data=null;
+    try{
+      const res=await fetch(project.url);
+      if(res.status===401||res.status===403) throw new Error('PERMISSION');
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      data=await res.json();
+    }catch(e){
+      if(e.message==='PERMISSION'||e.message==='Failed to fetch'){
+        const proxy='https://api.allorigins.win/raw?url='+encodeURIComponent(project.url);
+        const r2=await fetch(proxy);
+        if(!r2.ok) throw new Error('CORS');
+        data=await r2.json();
+      } else throw e;
     }
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const data=await res.json();
     renderProject(data, project);
   }catch(e){
-    if(e.message==='PERMISSION'||e.message==='Failed to fetch'){
-      // Proxy orqali urinish
-      try{
-        const proxy='https://api.allorigins.win/raw?url='+encodeURIComponent(project.url);
-        const res2=await fetch(proxy);
-        if(!res2.ok) throw new Error('proxy_fail');
-        const data=await res2.json();
-        renderProject(data, project);
-        return;
-      }catch(_){}
-      // FIX 2: Aniq va tushunarli xato
-      showError(
-        'Ma\'lumotga kirishda ruxsat muammosi',
-        'Firebase Storage da CORS yoki Rules muammo bor.\n\nQuyidagini tekshiring:',
-        '1. Firebase Console → Storage → Rules\n2. Quyidagiga o\'zgartiring:\n\nallow read: if true;\n\n3. Yoki: Storage → CORS sozlamasi'
-      );
+    if(e.message==='CORS'){
+      showError("Ma'lumotga kirishda ruxsat muammosi",
+        "Firebase Storage → Rules ni tekshiring:",
+        "rules_version = '2';\nservice firebase.storage {\n  match /b/{bucket}/o {\n    match /{allPaths=**} {\n      allow read: if true;\n    }\n  }\n}");
     } else {
-      showError(
-        'Yuklab bo\'lmadi',
-        'Ma\'lumotlar serverdan kelmadi.',
-        'Xato: '+e.message+'\nURL: '+project.url.slice(0,60)+'...'
-      );
+      showError('Yuklab bo\'lmadi','Server javobi yo\'q.','Xato: '+e.message);
     }
   }
 }
 
-// ---- RENDER ----
+// ---- BRAND ----
+function applyBrand(project){
+  const brand=project.brand||{};
+  const color=brand.color||'#e8c97a';
+  document.documentElement.style.setProperty('--accent', color);
+
+  const nameEl=document.getElementById('brand-name');
+  if(brand.company) nameEl.textContent=brand.company.toUpperCase();
+
+  if(brand.logo){
+    const img=document.getElementById('brand-logo');
+    img.src=brand.logo;img.style.display='block';
+    nameEl.style.display='none';
+  }
+}
+
+// ---- RENDER PROJECT ----
 function renderProject(data, project){
-  rooms=data.rooms||[];
+  // floors yoki oddiy rooms
+  if(data.floors&&data.floors.length>0){
+    allFloors=data.floors;
+  } else {
+    allFloors=[{id:'floor-1',label:'1-qavat',rooms:data.rooms||[]}];
+  }
+
   document.getElementById('proj-name').textContent=data.name||project.name||'—';
   document.getElementById('proj-meta').textContent=data.address||project.address||'—';
   document.getElementById('s-area').textContent=data.totalArea||'—';
-  document.getElementById('s-rooms').textContent=rooms.length;
-  buildRoomList();
-  resizeCanvas();
+
+  const totalRooms=allFloors.reduce((s,f)=>s+(f.rooms||[]).length,0);
+  document.getElementById('s-rooms').textContent=totalRooms;
+
+  // Floor tabs
+  buildFloorTabs();
+
+  // Premium view toggle
+  if(isPremium){
+    document.getElementById('view-toggle').style.display='flex';
+    document.getElementById('premium-badge').style.display='inline-block';
+  }
+
+  switchFloor(0);
   showScreen('viewer');
+  setTimeout(resizeCanvas,50);
 }
 
+// ---- FLOOR TABS ----
+function buildFloorTabs(){
+  const tabs=document.getElementById('floor-tabs');
+  tabs.innerHTML='';
+  allFloors.forEach((f,i)=>{
+    const btn=document.createElement('button');
+    btn.className='floor-tab'+(i===0?' active':'');
+    btn.textContent=f.label||('Qavat '+(i+1));
+    btn.onclick=()=>switchFloor(i);
+    btn.id='ftab-'+i;
+    tabs.appendChild(btn);
+  });
+}
+
+function switchFloor(idx){
+  currentFloorIdx=idx;
+  rooms=allFloors[idx].rooms||[];
+  selected=null;
+
+  document.querySelectorAll('.floor-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  document.getElementById('rl-floor-label').textContent=(allFloors[idx].label||'Xonalar')+' xonalari';
+
+  clearSelection();
+  buildRoomList();
+  resizeCanvas();
+}
+
+// ---- VIEW TOGGLE (premium) ----
+function setView(mode){
+  viewMode=mode;
+  document.getElementById('btn-25d').classList.toggle('active',mode==='2.5d');
+  document.getElementById('btn-2d').classList.toggle('active',mode==='2d');
+  draw();
+}
+
+// ---- ROOM LIST ----
 function buildRoomList(){
   const body=document.getElementById('room-list-body');
   body.innerHTML='';
@@ -232,29 +316,85 @@ function buildRoomList(){
   });
 }
 
-// ---- CANVAS ----
-function toIso(gx,gy){return{x:OX+(gx-gy)*UNIT*ISO_X,y:OY+(gx+gy)*UNIT*ISO_Y};}
+// ---- CLEAR SELECTION ----
+function clearSelection(){
+  selected=null;
+  document.querySelectorAll('.room-item').forEach(el=>el.classList.remove('active'));
+  const card=document.getElementById('info-card');
+  card.className='info-card';
+  card.innerHTML='<div class="idle-hint">Xonaga bosing<br>ma\'lumot ko\'rish uchun</div>';
+}
 
-function drawRoom(r,isHov,isSel){
+function selectRoom(id){
+  selected=id;
+  document.querySelectorAll('.room-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('li-'+id)?.classList.add('active');
+  document.getElementById('li-'+id)?.scrollIntoView({behavior:'smooth',block:'nearest'});
+  const r=rooms.find(x=>x.id===id);if(!r)return;
+  const card=document.getElementById('info-card');
+  card.className='info-card has-data';
+  card.style.borderColor=r.color+'55';
+  card.innerHTML=`
+    <div class="room-accent-bar" style="background:${r.color}"></div>
+    <div class="room-name-big">${r.name}</div>
+    <div class="room-type-sm">${r.type}</div>
+    <div class="info-grid">
+      <div class="info-cell"><div class="info-cell-lbl">Maydon</div><div class="info-cell-val" style="color:${r.color}">${r.area}</div></div>
+      <div class="info-cell"><div class="info-cell-lbl">O'lcham</div><div class="info-cell-val">${r.size}</div></div>
+      <div class="info-cell"><div class="info-cell-lbl">Deraza</div><div class="info-cell-val">${r.windows}</div></div>
+      <div class="info-cell"><div class="info-cell-lbl">Eshik</div><div class="info-cell-val">${r.doors}</div></div>
+    </div>
+    <div class="info-desc">${r.desc}</div>`;
+  draw();
+}
+
+// ================================================================
+// DRAW — 2.5D ISO yoki 2D
+// ================================================================
+function toIso(gx,gy){return{x:OX+(gx-gy)*UNIT*ISO_X,y:OY+(gx+gy)*UNIT*ISO_Y};}
+function toFlat(gx,gy){return{x:OX+gx*UNIT,y:OY+gy*UNIT};}
+function pt(gx,gy){return viewMode==='2d'?toFlat(gx,gy):toIso(gx,gy);}
+
+function draw(){
+  const W=cv.width/dpr, H=cv.height/dpr;
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.fillStyle='#0f0f10';ctx.fillRect(0,0,cv.width,cv.height);
+
+  // Grid
+  ctx.strokeStyle='rgba(255,255,255,0.025)';ctx.lineWidth=.5;
+  for(let i=0;i<=12;i++){
+    const a=pt(i,0),b=pt(i,10);
+    ctx.beginPath();ctx.moveTo(a.x,a.y+(viewMode==='2d'?0:WALL_H));ctx.lineTo(b.x,b.y+(viewMode==='2d'?0:WALL_H));ctx.stroke();
+  }
+  for(let j=0;j<=10;j++){
+    const a=pt(0,j),b=pt(12,j);
+    ctx.beginPath();ctx.moveTo(a.x,a.y+(viewMode==='2d'?0:WALL_H));ctx.lineTo(b.x,b.y+(viewMode==='2d'?0:WALL_H));ctx.stroke();
+  }
+
+  [...rooms].sort((a,b)=>(a.gx+a.gy)-(b.gx+b.gy))
+    .forEach(r=>viewMode==='2d'?drawRoom2D(r,r.id===hovered,r.id===selected):drawRoom25D(r,r.id===hovered,r.id===selected));
+}
+
+// ---- 2.5D ----
+function drawRoom25D(r,isHov,isSel){
   const{gx,gy,gw,gh}=r;
   const lift=isSel?7:isHov?3:0;
   const al=isSel?'ff':isHov?'ee':'bb';
-  const P=(x,y)=>toIso(x,y);
-  const p00=P(gx,gy),p10=P(gx+gw,gy),p11=P(gx+gw,gy+gh),p01=P(gx,gy+gh);
+  const p00=toIso(gx,gy),p10=toIso(gx+gw,gy),p11=toIso(gx+gw,gy+gh),p01=toIso(gx,gy+gh);
   const poly=(pts,fill,stroke)=>{
     ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
     ctx.closePath();ctx.fillStyle=fill;ctx.fill();
     if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke();}
   };
-  const L=pt=>({x:pt.x,y:pt.y-lift});
+  const L=p=>({x:p.x,y:p.y-lift});
   const sc=isSel?r.color:null;
   poly([L(p00),L(p10),L(p11),L(p01)],r.floor+al,sc);
   poly([L(p01),L(p11),{x:p11.x,y:p11.y-lift+WALL_H},{x:p01.x,y:p01.y-lift+WALL_H}],r.wallLeft+al,sc);
   poly([L(p10),L(p11),{x:p11.x,y:p11.y-lift+WALL_H},{x:p10.x,y:p10.y-lift+WALL_H}],r.wallRight+al,sc);
-  const T=pt=>({x:pt.x,y:pt.y-lift-WALL_H});
+  const T=p=>({x:p.x,y:p.y-lift-WALL_H});
   poly([T(p00),T(p10),T(p11),T(p01)],r.wallTop+al,sc);
-  [p00,p10,p11,p01].forEach(pt=>{
-    ctx.beginPath();ctx.moveTo(pt.x,pt.y-lift-WALL_H);ctx.lineTo(pt.x,pt.y-lift);
+  [p00,p10,p11,p01].forEach(p=>{
+    ctx.beginPath();ctx.moveTo(p.x,p.y-lift-WALL_H);ctx.lineTo(p.x,p.y-lift);
     ctx.strokeStyle='rgba(0,0,0,0.22)';ctx.lineWidth=.7;ctx.stroke();
   });
   const w1=toIso(gx+gw*.2,gy),w2=toIso(gx+gw*.8,gy);
@@ -272,46 +412,44 @@ function drawRoom(r,isHov,isSel){
   ctx.restore();
 }
 
-function draw(){
-  ctx.clearRect(0,0,cv.width,cv.height);
-  ctx.fillStyle='#0f0f10';ctx.fillRect(0,0,cv.width,cv.height);
-  ctx.strokeStyle='rgba(255,255,255,0.025)';ctx.lineWidth=.5;
-  for(let i=0;i<=10;i++){const a=toIso(i,0),b=toIso(i,9);ctx.beginPath();ctx.moveTo(a.x,a.y+WALL_H);ctx.lineTo(b.x,b.y+WALL_H);ctx.stroke();}
-  for(let j=0;j<=9;j++){const a=toIso(0,j),b=toIso(10,j);ctx.beginPath();ctx.moveTo(a.x,a.y+WALL_H);ctx.lineTo(b.x,b.y+WALL_H);ctx.stroke();}
-  [...rooms].sort((a,b)=>(a.gx+a.gy)-(b.gx+b.gy)).forEach(r=>drawRoom(r,r.id===hovered,r.id===selected));
+// ---- 2D FLAT ----
+function drawRoom2D(r,isHov,isSel){
+  const{gx,gy,gw,gh}=r;
+  const p00=toFlat(gx,gy),p10=toFlat(gx+gw,gy),p11=toFlat(gx+gw,gy+gh),p01=toFlat(gx,gy+gh);
+  const al=isSel?.22:isHov?.14:.07;
+
+  // Fill
+  ctx.beginPath();[p00,p10,p11,p01].forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+  ctx.closePath();
+  ctx.fillStyle=r.color+(Math.round(al*255).toString(16).padStart(2,'0'));
+  ctx.fill();
+
+  // Border
+  ctx.strokeStyle=isSel?r.color:(isHov?r.color+'99':r.color+'44');
+  ctx.lineWidth=isSel?2:1;ctx.stroke();
+
+  // Devor (qalin chiziqlar)
+  ctx.strokeStyle='rgba(240,237,230,0.6)';ctx.lineWidth=3;
+  [[p00,p10],[p10,p11],[p11,p01],[p01,p00]].forEach(([a,b])=>{
+    ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+  });
+
+  // Deraza (top side)
+  const wx=UNIT*gw*.3;
+  ctx.strokeStyle='rgba(86,180,211,0.8)';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(p00.x+wx,p00.y);ctx.lineTo(p10.x-wx,p10.y);ctx.stroke();
+
+  // Label
+  const cx=(p00.x+p11.x)/2,cy=(p00.y+p11.y)/2;
+  ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.font=`600 ${Math.max(9,UNIT*.17)}px Syne,sans-serif`;
+  ctx.fillStyle=isSel?'#fff':'rgba(255,255,255,0.85)';ctx.fillText(r.name,cx,cy-7);
+  ctx.font=`300 ${Math.max(8,UNIT*.14)}px Outfit,sans-serif`;
+  ctx.fillStyle=isSel?r.color:'rgba(255,255,255,0.5)';ctx.fillText(r.area,cx,cy+8);
+  ctx.restore();
 }
 
-// FIX 3: active class + info-card to'liq reset
-function clearSelection(){
-  selected=null;
-  document.querySelectorAll('.room-item').forEach(el=>el.classList.remove('active'));
-  document.getElementById('info-card').className='info-card';
-  document.getElementById('info-card').innerHTML='<div class="idle-hint">Xonaga bosing<br>ma\'lumot ko\'rish uchun</div>';
-  draw();
-}
-
-function selectRoom(id){
-  selected=id;
-  document.querySelectorAll('.room-item').forEach(el=>el.classList.remove('active'));
-  document.getElementById('li-'+id)?.classList.add('active');
-  document.getElementById('li-'+id)?.scrollIntoView({behavior:'smooth',block:'nearest'});
-  const r=rooms.find(x=>x.id===id);if(!r)return;
-  const card=document.getElementById('info-card');
-  card.className='info-card has-data';
-  card.innerHTML=`
-    <div class="room-accent-bar" style="background:${r.color}"></div>
-    <div class="room-name-big">${r.name}</div>
-    <div class="room-type-sm">${r.type}</div>
-    <div class="info-grid">
-      <div class="info-cell"><div class="info-cell-lbl">Maydon</div><div class="info-cell-val" style="color:${r.color}">${r.area}</div></div>
-      <div class="info-cell"><div class="info-cell-lbl">O'lcham</div><div class="info-cell-val">${r.size}</div></div>
-      <div class="info-cell"><div class="info-cell-lbl">Deraza</div><div class="info-cell-val">${r.windows}</div></div>
-      <div class="info-cell"><div class="info-cell-lbl">Eshik</div><div class="info-cell-val">${r.doors}</div></div>
-    </div>
-    <div class="info-desc">${r.desc}</div>`;
-  draw();
-}
-
+// ---- CANVAS RESIZE ----
 function resizeCanvas(){
   const wrap=cv.parentElement;
   const W=wrap.clientWidth||600;
@@ -322,31 +460,38 @@ function resizeCanvas(){
   if(rooms.length){
     const maxGx=Math.max(...rooms.map(r=>r.gx+r.gw));
     const maxGy=Math.max(...rooms.map(r=>r.gy+r.gh));
-    const isoH=(maxGx+maxGy)*UNIT*ISO_Y+WALL_H+UNIT*2;
-    OX=W/2;OY=Math.max(60,(H-isoH)/2+20);
+    if(viewMode==='2d'){
+      OX=(W-maxGx*UNIT)/2;OY=(H-maxGy*UNIT)/2;
+    } else {
+      const isoH=(maxGx+maxGy)*UNIT*ISO_Y+WALL_H+UNIT*2;
+      OX=W/2;OY=Math.max(60,(H-isoH)/2+20);
+    }
   } else{OX=W/2;OY=60;}
   draw();
 }
 
+// ---- HIT TEST ----
 function getPos(e){
   const rect=cv.getBoundingClientRect();const t=e.touches?e.touches[0]:e;
   return{x:t.clientX-rect.left,y:t.clientY-rect.top};
 }
-
-// FIX 4: hit test floor + top face ham tekshiriladi
 function hitTest(px,py){
   for(let i=rooms.length-1;i>=0;i--){
     const r=rooms[i];
-    // Floor polygon
-    const fp=[toIso(r.gx,r.gy),toIso(r.gx+r.gw,r.gy),toIso(r.gx+r.gw,r.gy+r.gh),toIso(r.gx,r.gy+r.gh)];
-    // Top face (WALL_H yuqorida)
-    const lift=r.id===selected?7:0;
-    const tp=fp.map(p=>({x:p.x,y:p.y-lift-WALL_H}));
-    if(polyHit(px,py,fp)||polyHit(px,py,tp)) return r.id;
+    let pts;
+    if(viewMode==='2d'){
+      pts=[toFlat(r.gx,r.gy),toFlat(r.gx+r.gw,r.gy),toFlat(r.gx+r.gw,r.gy+r.gh),toFlat(r.gx,r.gy+r.gh)];
+    } else {
+      const lift=r.id===selected?7:0;
+      const fp=[toIso(r.gx,r.gy),toIso(r.gx+r.gw,r.gy),toIso(r.gx+r.gw,r.gy+r.gh),toIso(r.gx,r.gy+r.gh)];
+      const tp=fp.map(p=>({x:p.x,y:p.y-lift-WALL_H}));
+      if(polyHit(px,py,fp)||polyHit(px,py,tp)) return r.id;
+      continue;
+    }
+    if(polyHit(px,py,pts)) return r.id;
   }
   return null;
 }
-
 function polyHit(px,py,pts){
   let inside=false;
   for(let a=0,b=pts.length-1;a<pts.length;b=a++){
@@ -358,21 +503,18 @@ function polyHit(px,py,pts){
 
 cv.addEventListener('mousemove',e=>{
   const{x,y}=getPos(e);const h=hitTest(x,y);
-  if(h!==hovered){hovered=h;draw();}
-  cv.style.cursor=h?'pointer':'default';
+  if(h!==hovered){hovered=h;draw();}cv.style.cursor=h?'pointer':'default';
 });
 cv.addEventListener('mouseleave',()=>{hovered=null;draw();});
 cv.addEventListener('click',e=>{
   const{x,y}=getPos(e);const h=hitTest(x,y);
-  if(h) selectRoom(h);
-  else clearSelection(); // FIX 3
+  if(h)selectRoom(h);else{clearSelection();draw();}
 });
 cv.addEventListener('touchstart',e=>{
   e.preventDefault();const{x,y}=getPos(e);const h=hitTest(x,y);
-  if(h) selectRoom(h);
-  else clearSelection();
+  if(h)selectRoom(h);else{clearSelection();draw();}
 },{passive:false});
-window.addEventListener('resize',resizeCanvas);
+window.addEventListener('resize',()=>{resizeCanvas();});
 init();
 </script>
 </body>
