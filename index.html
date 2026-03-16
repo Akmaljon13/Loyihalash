@@ -1,102 +1,378 @@
-{
-  "project": {
-    "id": "demo-archview-001",
-    "name": "Abdullayev 047",
-    "address": "Tashkent, Olmazor",
-    "client": "Abdullayev Family",
-    "scale": "1:100",
-    "units": "mm",
-    "updated": "2026-03-16"
-  },
-  "meta": {
-    "author": "ARCHVIEW",
-    "source": "manual-demo",
-    "notes": "Medium-detail JSON sample for Firebase Storage demo"
-  },
-  "rooms": [
-    {
-      "id": "r1",
-      "name": "Mehmonxona",
-      "type": "living",
-      "area": 24.6,
-      "perimeter": 20.4,
-      "dimensions": { "length": 6.2, "width": 4.0, "height": 3.0 },
-      "polygon": [[0,0],[6200,0],[6200,4000],[0,4000]],
-      "doors": [
-        { "id": "d1", "width": 900, "position": [3100,0], "direction": "in" }
-      ],
-      "windows": [
-        { "id": "w1", "width": 1800, "position": [6200,2000] }
-      ],
-      "finish": { "walls": "latex paint, warm white", "floor": "laminate", "ceiling": "gypsum" },
-      "notes": "Main family gathering space"
-    },
-    {
-      "id": "r2",
-      "name": "Oshxona",
-      "type": "kitchen",
-      "area": 12.5,
-      "perimeter": 14.4,
-      "dimensions": { "length": 4.5, "width": 2.8, "height": 3.0 },
-      "polygon": [[6200,0],[10700,0],[10700,2800],[6200,2800]],
-      "doors": [
-        { "id": "d2", "width": 800, "position": [6200,1400], "direction": "in" }
-      ],
-      "windows": [
-        { "id": "w2", "width": 1400, "position": [10700,1400] }
-      ],
-      "finish": { "walls": "tile up to 1.6m", "floor": "porcelain", "ceiling": "stretch" },
-      "notes": "Direct access to living room"
-    },
-    {
-      "id": "r3",
-      "name": "Yotoqxona",
-      "type": "bedroom",
-      "area": 16.8,
-      "perimeter": 16.6,
-      "dimensions": { "length": 4.2, "width": 4.0, "height": 3.0 },
-      "polygon": [[0,4000],[4200,4000],[4200,8000],[0,8000]],
-      "doors": [
-        { "id": "d3", "width": 800, "position": [4200,6000], "direction": "in" }
-      ],
-      "windows": [
-        { "id": "w3", "width": 1600, "position": [2100,8000] }
-      ],
-      "finish": { "walls": "matte paint", "floor": "wood", "ceiling": "gypsum" },
-      "notes": "Master bedroom"
-    },
-    {
-      "id": "r4",
-      "name": "Koridor",
-      "type": "hall",
-      "area": 9.8,
-      "perimeter": 16.0,
-      "dimensions": { "length": 5.6, "width": 1.75, "height": 3.0 },
-      "polygon": [[4200,4000],[6200,4000],[6200,8000],[4200,8000]],
-      "doors": [
-        { "id": "d4", "width": 800, "position": [5200,4000], "direction": "in" },
-        { "id": "d5", "width": 800, "position": [5200,8000], "direction": "in" }
-      ],
-      "windows": [],
-      "finish": { "walls": "decorative plaster", "floor": "porcelain", "ceiling": "gypsum" },
-      "notes": "Links all rooms"
-    },
-    {
-      "id": "r5",
-      "name": "Sanuzel",
-      "type": "bath",
-      "area": 6.2,
-      "perimeter": 12.0,
-      "dimensions": { "length": 2.8, "width": 2.2, "height": 3.0 },
-      "polygon": [[6200,2800],[8400,2800],[8400,5000],[6200,5000]],
-      "doors": [
-        { "id": "d6", "width": 700, "position": [6200,3900], "direction": "in" }
-      ],
-      "windows": [
-        { "id": "w4", "width": 600, "position": [8400,3900] }
-      ],
-      "finish": { "walls": "ceramic tiles", "floor": "anti-slip tile", "ceiling": "moisture resistant" },
-      "notes": "Compact combined bath"
-    }
-  ]
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArchView — Uy Rejasi</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0e0e0f;--bg2:#161617;--bg3:#1e1e20;
+  --border:#2a2a2e;--accent:#e8c97a;
+  --text:#f0ede6;--text2:#8a8680;--text3:#4a4845;
 }
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.center-box{text-align:center;max-width:440px}
+.spinner{width:40px;height:40px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.center-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:8px}
+.center-sub{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px}
+.btn{background:none;border:1px solid var(--border);color:var(--text2);font-family:'Outfit',sans-serif;font-size:13px;padding:9px 22px;border-radius:8px;cursor:pointer;transition:all .2s;margin:4px}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{border-color:var(--accent);color:var(--accent)}
+
+#viewer{display:none;width:100%;max-width:940px}
+.topbar{display:flex;align-items:center;gap:12px;padding:0 0 16px;border-bottom:1px solid var(--border);margin-bottom:20px;flex-wrap:wrap}
+.logo{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;color:var(--accent);flex-shrink:0}
+.proj-info{flex:1;min-width:0}
+.proj-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.proj-meta{font-size:11px;color:var(--text2);margin-top:2px}
+.stats{display:flex;gap:10px;flex-shrink:0}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px 14px;text-align:center}
+.stat-val{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--accent)}
+.stat-lbl{font-size:10px;color:var(--text2);margin-top:1px}
+
+.layout{display:flex;gap:16px;align-items:flex-start}
+.canvas-wrap{flex:1;background:var(--bg2);border-radius:14px;border:1px solid var(--border);overflow:hidden;min-width:0;position:relative}
+canvas{display:block;width:100%;cursor:pointer}
+
+.panel{width:260px;flex-shrink:0;display:flex;flex-direction:column;gap:12px}
+.info-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;min-height:180px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.info-card.has-data{align-items:flex-start;text-align:left;justify-content:flex-start}
+.idle-hint{font-size:12px;color:var(--text3);line-height:1.7}
+.room-accent-bar{width:36px;height:4px;border-radius:2px;margin-bottom:12px;flex-shrink:0}
+.room-name-big{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:3px}
+.room-type-sm{font-size:11px;color:var(--text2);margin-bottom:14px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-bottom:12px}
+.info-cell{background:var(--bg3);border-radius:8px;padding:8px 10px}
+.info-cell-lbl{font-size:10px;color:var(--text3);letter-spacing:.5px;margin-bottom:3px;text-transform:uppercase}
+.info-cell-val{font-size:13px;font-weight:500}
+.info-desc{font-size:12px;color:var(--text2);line-height:1.6;border-top:1px solid var(--border);padding-top:10px;width:100%}
+
+.room-list{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.rl-title{font-size:10px;color:var(--text3);letter-spacing:1px;padding:12px 14px 8px;text-transform:uppercase;font-weight:500}
+.room-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:background .15s;border-top:1px solid var(--border)}
+.room-item:hover{background:var(--bg3)}
+.room-item.active{background:rgba(232,201,122,.07);border-left:2px solid var(--accent)}
+.room-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.room-item-name{font-size:13px;font-weight:500;flex:1}
+.room-item-area{font-size:11px;color:var(--accent)}
+
+.tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(232,201,122,.1);color:var(--accent);border:1px solid rgba(232,201,122,.2);margin-bottom:8px}
+
+@media(max-width:660px){.layout{flex-direction:column}.panel{width:100%}.stats{display:none}}
+</style>
+</head>
+<body>
+
+<div class="center-box" id="screen-loading">
+  <div class="spinner"></div>
+  <div class="center-title">Yuklanmoqda</div>
+  <div class="center-sub" id="loading-msg">Ma'lumotlar olinmoqda...</div>
+</div>
+
+<div class="center-box" id="screen-error" style="display:none">
+  <div style="font-size:36px;margin-bottom:16px">⚠️</div>
+  <div class="center-title" id="err-title">Xatolik</div>
+  <div class="center-sub" id="err-msg"></div>
+  <div>
+    <button class="btn primary" onclick="location.reload()">Qayta urinish</button>
+    <button class="btn" onclick="showScreen('screen-loading');tryProxy()">Proxy orqali urinish</button>
+  </div>
+</div>
+
+<div id="viewer">
+  <div class="topbar">
+    <div class="logo">ARCHVIEW</div>
+    <div class="proj-info">
+      <div class="proj-name" id="proj-name">—</div>
+      <div class="proj-meta" id="proj-meta">—</div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="stat-val" id="s-area">—</div><div class="stat-lbl">Maydon</div></div>
+      <div class="stat"><div class="stat-val" id="s-rooms">—</div><div class="stat-lbl">Xona</div></div>
+    </div>
+  </div>
+  <div class="layout">
+    <div class="canvas-wrap">
+      <canvas id="cv"></canvas>
+    </div>
+    <div class="panel">
+      <div class="info-card" id="info-card">
+        <div class="idle-hint">Xonaga bosing<br>ma'lumot ko'rish uchun</div>
+      </div>
+      <div class="room-list">
+        <div class="rl-title">Xonalar</div>
+        <div id="room-list-body"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// LOYIHALAR — Firebase to'g'ridan-to'g'ri URL lar
+// ================================================================
+const PROJECTS = {
+  'abdullayev-047': 'https://firebasestorage.googleapis.com/v0/b/agrosuv-a2a3a.firebasestorage.app/o/autocad%2Fabdullayev%20-047%2Fdata.json?alt=media&token=49f752f8-82be-4171-a9dd-66ba925a31fb',
+  'karimov-048':    'https://firebasestorage.googleapis.com/v0/b/agrosuv-a2a3a.firebasestorage.app/o/autocad%2Fkarimov-048%2Fdata.json?alt=media&token=eac7ea97-d224-4842-b49f-a5aed0719652'
+};
+// Yangi mijoz: 'rahimov-049': 'firebase url...'
+// ================================================================
+
+// DEMO data — Firebase ishlamasa shu ko'rinadi
+const DEMO = {
+  'abdullayev-047': {
+    name:'Abdullayev oilasi uyi', address:'Toshkent viloyati · Loyiha №047',
+    totalArea:'72.0 m²', roomCount:4,
+    rooms:[
+      {id:'mehmon',name:'Mehmonxona',type:'Yashash xonasi',area:'20.4 m²',size:'4.8×4.3m',windows:'3 ta',doors:'1 ta',
+       desc:"Janubiy-g'arbiy tarafga qaragan asosiy yashash xonasi.",
+       color:'#e8c97a',floor:'#c8a870',wallTop:'#d4b896',wallLeft:'#b89a78',wallRight:'#a08060',gx:0,gy:0,gw:3,gh:3},
+      {id:'yotoq1',name:'Yotoqxona 1',type:'Ota-ona xonasi',area:'19.2 m²',size:'4.0×4.8m',windows:'3 ta',doors:'1 ta',
+       desc:'Shimoliy-sharqiy tomondan joylashgan katta yotoqxona.',
+       color:'#56b4d3',floor:'#7090a8',wallTop:'#8ab4c8',wallLeft:'#6898b0',wallRight:'#507898',gx:3,gy:0,gw:3,gh:3},
+      {id:'yotoq2',name:'Yotoqxona 2',type:'Bolalar xonasi',area:'14.8 m²',size:'3.6×4.1m',windows:'2 ta',doors:'1 ta',
+       desc:"G'arbiy tarafda bolalar uchun qulay xona.",
+       color:'#6fcf97',floor:'#78b088',wallTop:'#8ec89a',wallLeft:'#70aa80',wallRight:'#589068',gx:0,gy:3,gw:3,gh:2.5},
+      {id:'oshxona',name:'Oshxona',type:'Oshxona',area:'11.0 m²',size:'2.7×4.1m',windows:'1 ta',doors:'1 ta',
+       desc:"L-shaklidagi garnitur. 4 kishilik stol.",
+       color:'#eb9c56',floor:'#c89860',wallTop:'#d4a878',wallLeft:'#b88858',wallRight:'#a07040',gx:3,gy:3,gw:3,gh:2.5}
+    ]
+  },
+  'karimov-048': {
+    name:'Karimov oilasi uyi', address:'Samarqand shahri · Loyiha №048',
+    totalArea:'95.0 m²', roomCount:5,
+    rooms:[
+      {id:'mehmon',name:'Mehmonxona',type:'Yashash xonasi',area:'26.0 m²',size:'5.2×5.0m',windows:'4 ta',doors:'2 ta',
+       desc:'Katta va yorug\' mehmonxona.',
+       color:'#c084fc',floor:'#9060c0',wallTop:'#b090d8',wallLeft:'#9070c0',wallRight:'#7850a8',gx:0,gy:0,gw:3.5,gh:3.5},
+      {id:'yotoq1',name:'Yotoqxona 1',type:'Ota-ona xonasi',area:'22.0 m²',size:'4.4×5.0m',windows:'2 ta',doors:'1 ta',
+       desc:'Alohida kiyinish xonasi bilan.',
+       color:'#f87171',floor:'#c05050',wallTop:'#d87070',wallLeft:'#c05858',wallRight:'#a84040',gx:3.5,gy:0,gw:3,gh:3.5},
+      {id:'yotoq2',name:'Yotoqxona 2',type:'Bolalar xonasi',area:'16.0 m²',size:'3.2×5.0m',windows:'2 ta',doors:'1 ta',
+       desc:'Ikki bolaga mo\'ljallangan.',
+       color:'#34d399',floor:'#208860',wallTop:'#30a878',wallLeft:'#208860',wallRight:'#187048',gx:0,gy:3.5,gw:2.5,gh:3},
+      {id:'oshxona',name:'Oshxona',type:'Oshxona',area:'18.0 m²',size:'3.6×5.0m',windows:'2 ta',doors:'1 ta',
+       desc:'6 kishilik stol. Keng garnitur.',
+       color:'#fbbf24',floor:'#c08820',wallTop:'#d8a840',wallLeft:'#c09030',wallRight:'#a87020',gx:2.5,gy:3.5,gw:2.5,gh:3},
+      {id:'kabinet',name:'Kabinet',type:'Ish xonasi',area:'13.0 m²',size:'2.6×5.0m',windows:'1 ta',doors:'1 ta',
+       desc:'Uy-ofis. Kitoblar javoni va ish stoli.',
+       color:'#60a5fa',floor:'#3060a0',wallTop:'#5080c0',wallLeft:'#4070b0',wallRight:'#305898',gx:5,gy:3.5,gw:1.5,gh:3}
+    ]
+  }
+};
+
+// ================================================================
+let rooms=[], hovered=null, selected=null;
+const dpr=devicePixelRatio||1;
+const cv=document.getElementById('cv');
+const ctx=cv.getContext('2d');
+let currentId='';
+
+function showScreen(id){
+  ['screen-loading','screen-error','viewer'].forEach(s=>{
+    const el=document.getElementById(s);
+    el.style.display=s===id?(s==='viewer'?'block':'flex'):'none';
+  });
+}
+function showError(t,m){
+  document.getElementById('err-title').textContent=t;
+  document.getElementById('err-msg').textContent=m;
+  showScreen('screen-error');
+}
+
+async function init(){
+  const id=new URLSearchParams(location.search).get('id');
+  if(!id){showError("ID yo'q","URL: loyihalash.vercel.app/?id=abdullayev-047\n\nYoki: loyihalash.vercel.app/?id=karimov-048");return;}
+  currentId=id;
+  if(!PROJECTS[id]){showError("Topilmadi: "+id,"Mavjud: "+Object.keys(PROJECTS).join(', '));return;}
+  document.getElementById('loading-msg').textContent='"'+id+'" yuklanmoqda...';
+
+  // Firebase dan olishga urinish
+  try {
+    const res=await fetch(PROJECTS[id]);
+    if(!res.ok) throw new Error('status: '+res.status);
+    const data=await res.json();
+    renderProject(data, false);
+  } catch(e) {
+    // Firebase ishlamasa — demo data ishlatamiz
+    console.warn('Firebase CORS xatosi, demo data ishlatilmoqda:', e.message);
+    const demo=DEMO[id];
+    if(demo) renderProject(demo, true);
+    else showError('Xatolik', e.message);
+  }
+}
+
+function tryProxy(){
+  // allorigins proxy orqali urinib ko'rish
+  const id=currentId||new URLSearchParams(location.search).get('id');
+  const orig=PROJECTS[id];
+  if(!orig){showError('ID topilmadi','');return;}
+  document.getElementById('loading-msg').textContent='Proxy orqali urinilmoqda...';
+  const proxyUrl='https://api.allorigins.win/raw?url='+encodeURIComponent(orig);
+  fetch(proxyUrl)
+    .then(r=>{if(!r.ok)throw new Error('Proxy ham ishlamadi');return r.json();})
+    .then(data=>renderProject(data,false))
+    .catch(()=>{
+      const demo=DEMO[id];
+      if(demo) renderProject(demo,true);
+      else showError('Barcha urinishlar muvaffaqiyatsiz','Firebase Storage CORS sozlamalarini tekshiring');
+    });
+}
+
+function renderProject(data, isDemo){
+  rooms=data.rooms||[];
+  document.getElementById('proj-name').textContent=data.name||'—';
+  document.getElementById('proj-meta').textContent=(isDemo?'⚠ Demo ma\'lumot  |  ':'')+( data.address||'—');
+  document.getElementById('s-area').textContent=data.totalArea||'—';
+  document.getElementById('s-rooms').textContent=rooms.length;
+  buildRoomList();
+  resizeCanvas();
+  showScreen('viewer');
+}
+
+function buildRoomList(){
+  const body=document.getElementById('room-list-body');
+  body.innerHTML='';
+  rooms.forEach(r=>{
+    const el=document.createElement('div');
+    el.className='room-item';el.id='li-'+r.id;
+    el.innerHTML=`<div class="room-dot" style="background:${r.color}"></div><div class="room-item-name">${r.name}</div><div class="room-item-area">${r.area}</div>`;
+    el.onclick=()=>selectRoom(r.id);
+    body.appendChild(el);
+  });
+}
+
+// ---- 2D ISO RENDER ----
+const UNIT=55,ISO_X=0.866,ISO_Y=0.5,WALL_H=38;
+let OX=300,OY=70;
+
+function toIso(gx,gy){return{x:OX+(gx-gy)*UNIT*ISO_X,y:OY+(gx+gy)*UNIT*ISO_Y};}
+
+function drawRoom(r,isHov,isSel){
+  const{gx,gy,gw,gh}=r;
+  const lift=isSel?7:isHov?3:0;
+  const al=isSel?'ff':isHov?'ee':'bb';
+  const P=(x,y)=>toIso(x,y);
+  const p00=P(gx,gy),p10=P(gx+gw,gy),p11=P(gx+gw,gy+gh),p01=P(gx,gy+gh);
+
+  const poly=(pts,fill,stroke)=>{
+    ctx.beginPath();
+    pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+    ctx.closePath();ctx.fillStyle=fill;ctx.fill();
+    if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke();}
+  };
+
+  const L=pt=>({x:pt.x,y:pt.y-lift});
+  const sc=isSel?r.color:null;
+
+  poly([L(p00),L(p10),L(p11),L(p01)], r.floor+al, sc);
+  poly([L(p01),L(p11),{x:p11.x,y:p11.y-lift+WALL_H},{x:p01.x,y:p01.y-lift+WALL_H}], r.wallLeft+al, sc);
+  poly([L(p10),L(p11),{x:p11.x,y:p11.y-lift+WALL_H},{x:p10.x,y:p10.y-lift+WALL_H}], r.wallRight+al, sc);
+  const T=pt=>({x:pt.x,y:pt.y-lift-WALL_H});
+  poly([T(p00),T(p10),T(p11),T(p01)], r.wallTop+al, sc);
+
+  [p00,p10,p11,p01].forEach(pt=>{
+    ctx.beginPath();ctx.moveTo(pt.x,pt.y-lift-WALL_H);ctx.lineTo(pt.x,pt.y-lift);
+    ctx.strokeStyle='rgba(0,0,0,0.22)';ctx.lineWidth=.7;ctx.stroke();
+  });
+
+  // deraza
+  const w1=toIso(gx+gw*.2,gy),w2=toIso(gx+gw*.8,gy);
+  ctx.beginPath();
+  ctx.moveTo(w1.x,w1.y-lift-WALL_H*.2);ctx.lineTo(w1.x,w1.y-lift-WALL_H*.8);
+  ctx.lineTo(w2.x,w2.y-lift-WALL_H*.8);ctx.lineTo(w2.x,w2.y-lift-WALL_H*.2);
+  ctx.strokeStyle='rgba(86,180,211,0.6)';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle='rgba(86,180,211,0.1)';ctx.fill();
+
+  const cx=(p00.x+p10.x+p11.x+p01.x)/4,cy=(p00.y+p10.y+p11.y+p01.y)/4-lift;
+  ctx.save();
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.font=`600 ${Math.max(9,UNIT*.17)}px Syne,sans-serif`;
+  ctx.fillStyle=isSel?'#fff':'rgba(255,255,255,0.85)';
+  ctx.fillText(r.name,cx,cy-7);
+  ctx.font=`300 ${Math.max(8,UNIT*.14)}px Outfit,sans-serif`;
+  ctx.fillStyle=isSel?r.color:'rgba(255,255,255,0.45)';
+  ctx.fillText(r.area,cx,cy+8);
+  ctx.restore();
+}
+
+function draw(){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.fillStyle='#0f0f10';ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.strokeStyle='rgba(255,255,255,0.025)';ctx.lineWidth=.5;
+  for(let i=0;i<=10;i++){const a=toIso(i,0),b=toIso(i,9);ctx.beginPath();ctx.moveTo(a.x,a.y+WALL_H);ctx.lineTo(b.x,b.y+WALL_H);ctx.stroke();}
+  for(let j=0;j<=9;j++){const a=toIso(0,j),b=toIso(10,j);ctx.beginPath();ctx.moveTo(a.x,a.y+WALL_H);ctx.lineTo(b.x,b.y+WALL_H);ctx.stroke();}
+  [...rooms].sort((a,b)=>(a.gx+a.gy)-(b.gx+b.gy)).forEach(r=>drawRoom(r,r.id===hovered,r.id===selected));
+}
+
+function selectRoom(id){
+  selected=id;
+  document.querySelectorAll('.room-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('li-'+id)?.classList.add('active');
+  document.getElementById('li-'+id)?.scrollIntoView({behavior:'smooth',block:'nearest'});
+  const r=rooms.find(x=>x.id===id);if(!r)return;
+  const card=document.getElementById('info-card');
+  card.className='info-card has-data';
+  card.innerHTML=`
+    <div class="room-accent-bar" style="background:${r.color}"></div>
+    <div class="room-name-big">${r.name}</div>
+    <div class="room-type-sm">${r.type}</div>
+    <div class="info-grid">
+      <div class="info-cell"><div class="info-cell-lbl">Maydon</div><div class="info-cell-val" style="color:${r.color}">${r.area}</div></div>
+      <div class="info-cell"><div class="info-cell-lbl">O'lcham</div><div class="info-cell-val">${r.size}</div></div>
+      <div class="info-cell"><div class="info-cell-lbl">Deraza</div><div class="info-cell-val">${r.windows}</div></div>
+      <div class="info-cell"><div class="info-cell-lbl">Eshik</div><div class="info-cell-val">${r.doors}</div></div>
+    </div>
+    <div class="info-desc">${r.desc}</div>`;
+  draw();
+}
+
+function resizeCanvas(){
+  const W=cv.parentElement.clientWidth;
+  const H=Math.max(300,Math.min(500,W*.65));
+  cv.width=W*dpr;cv.height=H*dpr;
+  cv.style.height=H+'px';
+  ctx.scale(dpr,dpr);
+  OX=W/2;OY=50;
+  draw();
+}
+
+function getPos(e){
+  const rect=cv.getBoundingClientRect();
+  const t=e.touches?e.touches[0]:e;
+  return{x:t.clientX-rect.left,y:t.clientY-rect.top};
+}
+function hitTest(px,py){
+  for(let i=rooms.length-1;i>=0;i--){
+    const r=rooms[i];
+    const pts=[toIso(r.gx,r.gy),toIso(r.gx+r.gw,r.gy),toIso(r.gx+r.gw,r.gy+r.gh),toIso(r.gx,r.gy+r.gh)];
+    let inside=false;
+    for(let a=0,b=pts.length-1;a<pts.length;b=a++){
+      const xi=pts[a].x,yi=pts[a].y,xj=pts[b].x,yj=pts[b].y;
+      if(((yi>py)!=(yj>py))&&(px<(xj-xi)*(py-yi)/(yj-yi)+xi))inside=!inside;
+    }
+    if(inside)return r.id;
+  }
+  return null;
+}
+cv.addEventListener('mousemove',e=>{const{x,y}=getPos(e);const h=hitTest(x,y);if(h!==hovered){hovered=h;draw();}cv.style.cursor=h?'pointer':'default';});
+cv.addEventListener('mouseleave',()=>{hovered=null;draw();});
+cv.addEventListener('click',e=>{
+  const{x,y}=getPos(e);const h=hitTest(x,y);
+  if(h)selectRoom(h);
+  else{
+    selected=null;
+    document.getElementById('info-card').className='info-card';
+    document.getElementById('info-card').innerHTML='<div class="idle-hint">Xonaga bosing<br>ma\'lumot ko\'rish uchun</div>';
+    draw();
+  }
+});
+cv.addEventListener('touchstart',e=>{e.preventDefault();const{x,y}=getPos(e);const h=hitTest(x,y);if(h)selectRoom(h);},{passive:false});
+window.addEventListener('resize',resizeCanvas);
+init();
+</script>
+</body>
+</html>
