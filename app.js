@@ -193,28 +193,126 @@ function initMainMap(loc){
     zoomControl:true,attributionControl:false
   });
   window._mainMap=map;
+
+  // ArcGIS satellite
   L.tileLayer(
     'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     {maxZoom:19}
   ).addTo(map);
   L.tileLayer(
     'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
-    {maxZoom:19,opacity:0.7}
+    {maxZoom:19,opacity:0.6}
   ).addTo(map);
+
+  // 2D loyihani SVG overlay sifatida qo'shamiz
   if(loc.polygon&&loc.polygon.length>=3){
-    L.polygon(loc.polygon,{
-      color:'#e8c97a',
-      weight:2.5,
-      fill:false
-    }).addTo(map);
-  } else {
-    const icon=L.divIcon({
-      html:`<div style="width:14px;height:14px;background:#e8c97a;border:2px solid white;border-radius:50%;box-shadow:0 0 6px rgba(0,0,0,0.5)"></div>`,
-      iconSize:[14,14],iconAnchor:[7,7],className:''
-    });
-    L.marker(center,{icon}).addTo(map);
+    // Polygon burchaklari — [lat,lng] formatida
+    const poly=loc.polygon; // [[lat,lng],[lat,lng],...]
+
+    // Bounding box
+    const lats=poly.map(p=>p[0]);
+    const lngs=poly.map(p=>p[1]);
+    const minLat=Math.min(...lats), maxLat=Math.max(...lats);
+    const minLng=Math.min(...lngs), maxLng=Math.max(...lngs);
+
+    // SVG overlay bounds
+    const bounds=[[minLat,minLng],[maxLat,maxLng]];
+
+    // Xonalar SVG sifatida chiziladi
+    const svgEl=drawRoomsAsSVG(poly,bounds);
+
+    // Leaflet SVG overlay
+    const overlay=L.svgOverlay(svgEl,bounds,{opacity:0.85,interactive:false});
+    overlay.addTo(map);
   }
+
   setTimeout(()=>map.invalidateSize(),100);
+}
+
+function drawRoomsAsSVG(poly,bounds){
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('xmlns','http://www.w3.org/2000/svg');
+  svg.setAttribute('width','100%');
+  svg.setAttribute('height','100%');
+  svg.setAttribute('viewBox','0 0 1 1');
+  svg.setAttribute('preserveAspectRatio','none');
+
+  // Bounds
+  const minLat=bounds[0][0],minLng=bounds[0][1];
+  const maxLat=bounds[1][0],maxLng=bounds[1][1];
+  const dLat=maxLat-minLat;
+  const dLng=maxLng-minLng;
+
+  // Koordinatadan SVG ga o'girish (lat teskari)
+  function toSVG(lat,lng){
+    return {
+      x:(lng-minLng)/dLng,
+      y:1-(lat-minLat)/dLat
+    };
+  }
+
+  // Xonalarni chizish
+  rooms.forEach(r=>{
+    // Har bir xona polygon ichida qayerda joylashganini hisoblash
+    // gx,gy,gw,gh — grid koordinatalar
+    // Polygon 4 ta burchak — grid ga moslashtirish
+
+    // Grid o'lchamini topish
+    const maxGx=Math.max(...rooms.map(x=>x.gx+x.gw));
+    const maxGy=Math.max(...rooms.map(x=>x.gy+x.gh));
+
+    // Grid → geo koordinata
+    // Polygon burchaklari: [0] topLeft, [1] bottomLeft, [2] bottomRight, [3] topRight
+    // (yoki shunga o'xshash tartib)
+    const p=poly;
+
+    // Bilinear interpolation — grid pozitsiyasidan geo koordinata
+    function gridToGeo(gx,gy){
+      const tx=gx/maxGx, ty=gy/maxGy;
+      // Top edge: p[0] → p[3], Bottom edge: p[1] → p[2]
+      const topLat=p[0][0]+(p[3][0]-p[0][0])*tx;
+      const topLng=p[0][1]+(p[3][1]-p[0][1])*tx;
+      const botLat=p[1][0]+(p[2][0]-p[1][0])*tx;
+      const botLng=p[1][1]+(p[2][1]-p[1][1])*tx;
+      const lat=topLat+(botLat-topLat)*ty;
+      const lng=topLng+(botLng-topLng)*ty;
+      return [lat,lng];
+    }
+
+    // 4 burchak
+    const tl=gridToGeo(r.gx,r.gy);
+    const tr=gridToGeo(r.gx+r.gw,r.gy);
+    const br=gridToGeo(r.gx+r.gw,r.gy+r.gh);
+    const bl=gridToGeo(r.gx,r.gy+r.gh);
+
+    const pts=[tl,tr,br,bl].map(([lat,lng])=>toSVG(lat,lng));
+    const ptStr=pts.map(p=>`${p.x},${p.y}`).join(' ');
+
+    // Xona polygon
+    const polygon=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    polygon.setAttribute('points',ptStr);
+    polygon.setAttribute('fill',r.color+'99'); // 60% shaffof
+    polygon.setAttribute('stroke',r.color);
+    polygon.setAttribute('stroke-width','0.003');
+    svg.appendChild(polygon);
+
+    // Xona nomi
+    const cx=pts.reduce((s,p)=>s+p.x,0)/4;
+    const cy=pts.reduce((s,p)=>s+p.y,0)/4;
+    const text=document.createElementNS('http://www.w3.org/2000/svg','text');
+    text.setAttribute('x',cx);
+    text.setAttribute('y',cy);
+    text.setAttribute('text-anchor','middle');
+    text.setAttribute('dominant-baseline','middle');
+    text.setAttribute('font-size','0.06');
+    text.setAttribute('font-weight','600');
+    text.setAttribute('fill','white');
+    text.setAttribute('font-family','Syne,sans-serif');
+    text.textContent=r.name;
+    svg.appendChild(text);
+  });
+
+  return svg;
 }
 
 // ---- BRAND ----
