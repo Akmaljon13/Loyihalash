@@ -514,3 +514,5 @@ function initMap(loc){
     L.marker(center, {icon}).addTo(map);
   }
 }
+
+}
