@@ -203,8 +203,9 @@ function initMainMap(loc){
   ).addTo(map);
   if(loc.polygon&&loc.polygon.length>=3){
     L.polygon(loc.polygon,{
-      color:'#e8c97a',weight:2.5,
-      fillColor:'#e8c97a',fillOpacity:0.2
+      color:'#e8c97a',
+      weight:2.5,
+      fill:false
     }).addTo(map);
   } else {
     const icon=L.divIcon({
