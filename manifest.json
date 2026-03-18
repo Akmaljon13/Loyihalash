@@ -1,12 +1,22 @@
 {
   "abdullayev-047": {
-    "url": "https://firebasestorage.googleapis.com/v0/b/agrosuv-a2a3a.firebasestorage.app/o/autocad%2Fabdullayev%20-047%2Fdata%20(1).json?alt=media&token=2248b36c-c172-4ed5-8cb4-246e82a4b5be",
+    "url": "https://firebasestorage.googleapis.com/v0/b/agrosuv-a2a3a.firebasestorage.app/o/autocad%2Fabdullayev%20-047%2Fdata.json?alt=media&token=49f752f8-82be-4171-a9dd-66ba925a31fb",
     "name": "Abdullayev oilasi uyi",
     "owner": "Abdullayev Jasur Xolmatovich",
     "address": "Toshkent viloyati · Loyiha №047",
     "status": "ready",
     "createdAt": "2024-01-15",
     "premium": true,
+    "location": {
+      "polygon": [
+        [40.710125, 68.699983],
+        [40.709933, 68.700039],
+        [40.709969, 68.700319],
+        [40.710161, 68.700269]
+      ],
+      "center": [40.710047, 68.700153],
+      "zoom": 18
+    },
     "brand": {
       "company": "GeoProekt",
       "color": "#e8c97a",
@@ -21,6 +31,11 @@
     "status": "ready",
     "createdAt": "2024-01-18",
     "premium": true,
+    "location": {
+      "lat": 39.654100,
+      "lng": 66.975200,
+      "zoom": 17
+    },
     "brand": {
       "company": "ArchStudio",
       "color": "#56b4d3",
