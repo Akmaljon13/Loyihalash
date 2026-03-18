@@ -73,28 +73,6 @@ function openDrawer(r){
   }
   document.getElementById('drawer').classList.add('show');
   document.getElementById('overlay').classList.add('show');
-
-  // XARITA
-  const mapWrap=document.getElementById('dw-map-wrap');
-  const loc=window._currentProject&&window._currentProject.location;
-  if(loc&&(loc.center||loc.lat)){
-    mapWrap.style.display='block';
-    if(!window._leafletLoaded){
-      window._leafletLoaded=true;
-      const lnk=document.createElement('link');
-      lnk.rel='stylesheet';
-      lnk.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-      document.head.appendChild(lnk);
-      const scr=document.createElement('script');
-      scr.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-      scr.onload=()=>initMap(loc);
-      document.head.appendChild(scr);
-    } else if(window.L){
-      initMap(loc);
-    }
-  } else {
-    mapWrap.style.display='none';
-  }
 }
 
 // ---- SELECT ROOM ----
@@ -148,12 +126,94 @@ function switchFloor(idx){
 }
 
 // ---- VIEW ----
+let _mapInitialized=false;
+
 function setView(mode){
   viewMode=mode;
   document.getElementById('btn-25d').classList.toggle('active',mode==='2.5d');
   document.getElementById('btn-2d').classList.toggle('active',mode==='2d');
+  // 2D da xarita tugmasi, location bo'lsa
+  const mapBtn=document.getElementById('map-toggle-btn');
+  const loc=window._currentProject&&window._currentProject.location;
+  if(mode==='2d'&&loc){
+    mapBtn.style.display='flex';
+  } else {
+    mapBtn.style.display='none';
+    closeMap();
+  }
   fitToScreen();
   draw();
+}
+
+function toggleMap(){
+  const panel=document.getElementById('map-panel');
+  const btn=document.getElementById('map-toggle-btn');
+  const isOpen=panel.classList.contains('open');
+  if(isOpen){
+    closeMap();
+  } else {
+    panel.classList.add('open');
+    btn.classList.add('active');
+    // Xarita bir marta yuklanadi
+    const loc=window._currentProject&&window._currentProject.location;
+    if(loc&&!_mapInitialized){
+      _mapInitialized=true;
+      if(!window.L){
+        const lnk=document.createElement('link');
+        lnk.rel='stylesheet';
+        lnk.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(lnk);
+        const scr=document.createElement('script');
+        scr.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        scr.onload=()=>initMainMap(loc);
+        document.head.appendChild(scr);
+      } else {
+        initMainMap(loc);
+      }
+    } else if(window._mainMap){
+      setTimeout(()=>window._mainMap.invalidateSize(),350);
+    }
+    // canvas kichrayadi
+    setTimeout(()=>{resizeCanvas();fitToScreen();},360);
+  }
+}
+
+function closeMap(){
+  const panel=document.getElementById('map-panel');
+  const btn=document.getElementById('map-toggle-btn');
+  panel.classList.remove('open');
+  btn.classList.remove('active');
+  setTimeout(()=>{resizeCanvas();fitToScreen();},360);
+}
+
+function initMainMap(loc){
+  const center=loc.center?[loc.center[0],loc.center[1]]:[loc.lat,loc.lng];
+  const map=L.map('main-map',{
+    center,zoom:loc.zoom||18,
+    zoomControl:true,attributionControl:false
+  });
+  window._mainMap=map;
+  L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    {maxZoom:19}
+  ).addTo(map);
+  L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+    {maxZoom:19,opacity:0.7}
+  ).addTo(map);
+  if(loc.polygon&&loc.polygon.length>=3){
+    L.polygon(loc.polygon,{
+      color:'#e8c97a',weight:2.5,
+      fillColor:'#e8c97a',fillOpacity:0.2
+    }).addTo(map);
+  } else {
+    const icon=L.divIcon({
+      html:`<div style="width:14px;height:14px;background:#e8c97a;border:2px solid white;border-radius:50%;box-shadow:0 0 6px rgba(0,0,0,0.5)"></div>`,
+      iconSize:[14,14],iconAnchor:[7,7],className:''
+    });
+    L.marker(center,{icon}).addTo(map);
+  }
+  setTimeout(()=>map.invalidateSize(),100);
 }
 
 // ---- BRAND ----
