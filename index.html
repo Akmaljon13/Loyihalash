@@ -48,10 +48,21 @@
 
   <div class="toolbar">
     <div class="floor-tabs" id="floor-tabs"></div>
-    <div class="vtoggle" id="vtoggle" style="display:none">
-      <button class="vbtn active" id="btn-25d" onclick="setView('2.5d')">2.5D</button>
-      <button class="vbtn" id="btn-2d" onclick="setView('2d')">2D</button>
+    <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+      <button class="map-toggle-btn" id="map-toggle-btn" onclick="toggleMap()" style="display:none">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+        Xarita
+      </button>
+      <div class="vtoggle" id="vtoggle" style="display:none">
+        <button class="vbtn active" id="btn-25d" onclick="setView('2.5d')">2.5D</button>
+        <button class="vbtn" id="btn-2d" onclick="setView('2d')">2D</button>
+      </div>
     </div>
+  </div>
+
+  <!-- MAP PANEL — pastki -->
+  <div class="map-panel" id="map-panel">
+    <div id="main-map" style="width:100%;height:100%"></div>
   </div>
 
   <div class="canvas-area" id="canvas-area">
@@ -99,9 +110,6 @@
     </div>
     <div class="dw-features" id="dw-features"></div>
     <div class="dw-desc" id="dw-desc"></div>
-
-    <!-- XARITA -->
-    <div id="dw-map-wrap" style="display:none;margin-top:14px;border-radius:12px;overflow:hidden;height:220px;border:1px solid var(--border)"></div>
   </div>
 </div>
 
