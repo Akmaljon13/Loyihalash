@@ -1,4 +1,3 @@
-
 const ISO_X=0.866,ISO_Y=0.5,WALL_H_BASE=36,UNIT_BASE=52;
 let UNIT=UNIT_BASE,WALL_H=WALL_H_BASE;
 let allFloors=[],rooms=[],currentFloorIdx=0;
@@ -463,7 +462,6 @@ init();
 // ---- XARITA ----
 function initMap(loc){
   const container = document.getElementById('dw-map-wrap');
-  // Eski xaritani tozalash
   let mapDiv = document.getElementById('leaflet-map');
   if(mapDiv){
     mapDiv.remove();
@@ -474,30 +472,45 @@ function initMap(loc){
   mapDiv.style.cssText = 'width:100%;height:100%';
   container.appendChild(mapDiv);
 
+  // Markaz — polygon bo'lsa o'rtasi, bo'lmasa lat/lng
+  const center = loc.center
+    ? [loc.center[0], loc.center[1]]
+    : [loc.lat, loc.lng];
+
   const map = L.map('leaflet-map',{
-    center:[loc.lat, loc.lng],
-    zoom: loc.zoom||17,
-    zoomControl:true,
-    attributionControl:false
+    center: center,
+    zoom: loc.zoom||18,
+    zoomControl: true,
+    attributionControl: false
   });
   window._leafletMap = map;
 
-  // ArcGIS World Imagery — sun'iy yo'ldosh
+  // ArcGIS World Imagery
   L.tileLayer(
     'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     {maxZoom:19}
   ).addTo(map);
 
-  // ArcGIS Labels ustiga
+  // Ko'cha nomlari
   L.tileLayer(
     'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
-    {maxZoom:19,opacity:0.7}
+    {maxZoom:19, opacity:0.7}
   ).addTo(map);
 
-  // Marker
-  const icon = L.divIcon({
-    html:`<div style="width:14px;height:14px;background:var(--accent);border:2px solid white;border-radius:50%;box-shadow:0 0 6px rgba(0,0,0,0.4)"></div>`,
-    iconSize:[14,14],iconAnchor:[7,7],className:''
-  });
-  L.marker([loc.lat,loc.lng],{icon}).addTo(map);
+  // Polygon — 4 burchak bor bo'lsa
+  if(loc.polygon && loc.polygon.length >= 3){
+    L.polygon(loc.polygon, {
+      color: '#e8c97a',
+      weight: 2.5,
+      fillColor: '#e8c97a',
+      fillOpacity: 0.18
+    }).addTo(map);
+  } else {
+    // Oddiy marker
+    const icon = L.divIcon({
+      html:`<div style="width:14px;height:14px;background:#e8c97a;border:2px solid white;border-radius:50%;box-shadow:0 0 6px rgba(0,0,0,0.5)"></div>`,
+      iconSize:[14,14], iconAnchor:[7,7], className:''
+    });
+    L.marker(center, {icon}).addTo(map);
+  }
 }
