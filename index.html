@@ -5,133 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ArchView</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0a0a0b;--bg2:#131314;--bg3:#1a1a1c;--bg4:#222224;
-  --border:#252528;--border2:#2e2e32;
-  --accent:#e8c97a;--accent2:#c4a24d;
-  --text:#f0ede6;--text2:#8a8680;--text3:#4a4845;
-  --radius:16px;
-}
-html,body{height:100%;overflow:hidden;touch-action:none;-webkit-tap-highlight-color:transparent}
-body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column}
-
-/* ===== LOADING ===== */
-.fullscreen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;background:var(--bg);z-index:999}
-.spinner{width:36px;height:36px;border:1.5px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.fs-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:8px}
-.fs-sub{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px;white-space:pre-line;max-width:320px}
-.err-code{font-family:'Courier New',monospace;font-size:11px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin:10px 0;text-align:left;color:var(--text2);line-height:1.7;max-width:320px;word-break:break-all}
-.ubtn{background:none;border:1px solid var(--border2);color:var(--text2);font-family:'Outfit',sans-serif;font-size:13px;padding:10px 24px;border-radius:10px;cursor:pointer;transition:all .2s}
-.ubtn:active{opacity:.7}
-
-/* ===== VIEWER ===== */
-#viewer{display:none;flex-direction:column;height:100dvh;overflow:hidden}
-
-/* TOPBAR */
-.topbar{flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 16px 8px}
-.tb-row1{display:flex;align-items:center;gap:10px;margin-bottom:6px}
-.brand-pill{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;color:var(--accent);padding:3px 8px;border:1px solid rgba(232,201,122,.25);border-radius:20px;flex-shrink:0}
-.proj-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tb-row2{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.owner-row{display:flex;align-items:center;gap:5px;min-width:0}
-.owner-av{width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,rgba(232,201,122,.2),rgba(232,201,122,.05));border:1px solid rgba(232,201,122,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.owner-txt{font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tb-stats{display:flex;gap:6px;flex-shrink:0}
-.tbstat{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:4px 9px;text-align:center;min-width:44px}
-.tbstat-v{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--accent)}
-.tbstat-l{font-size:9px;color:var(--text3)}
-
-/* TOOLBAR */
-.toolbar{flex-shrink:0;display:flex;align-items:center;padding:6px 16px;gap:8px;border-bottom:1px solid var(--border);background:var(--bg)}
-.floor-tabs{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;flex:1}
-.floor-tabs::-webkit-scrollbar{display:none}
-.ftab{flex-shrink:0;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-family:'Outfit',sans-serif;font-size:11px;padding:5px 12px;border-radius:7px;cursor:pointer;transition:all .2s;white-space:nowrap}
-.ftab.active{border-color:var(--accent);color:var(--accent);background:rgba(232,201,122,.06)}
-.vtoggle{display:flex;gap:2px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:2px;flex-shrink:0}
-.vbtn{background:none;border:none;color:var(--text3);font-family:'Outfit',sans-serif;font-size:10px;font-weight:500;padding:4px 10px;border-radius:6px;cursor:pointer;transition:all .2s;white-space:nowrap}
-.vbtn.active{background:var(--bg3);color:var(--accent);border:1px solid rgba(232,201,122,.2)}
-
-/* CANVAS */
-.canvas-area{flex:1;position:relative;overflow:hidden;background:var(--bg);touch-action:none}
-canvas{position:absolute;top:0;left:0;touch-action:none}
-.zoom-hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:10px;color:rgba(255,255,255,0.15);pointer-events:none;white-space:nowrap;transition:opacity 1s;letter-spacing:.3px}
-
-/* ROOM STRIP */
-.room-strip{flex-shrink:0;display:flex;gap:6px;padding:8px 16px;overflow-x:auto;scrollbar-width:none;border-top:1px solid var(--border);background:var(--bg2)}
-.room-strip::-webkit-scrollbar{display:none}
-.rchip{flex-shrink:0;display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:6px 10px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent}
-.rchip:active{transform:scale(.95)}
-.rchip.active{border-color:var(--accent);background:rgba(232,201,122,.06)}
-.rchip-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.rchip-name{font-size:11px;font-weight:500;white-space:nowrap;color:var(--text)}
-.rchip-area{font-size:10px;color:var(--text2);white-space:nowrap}
-
-/* ===== DRAWER ===== */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:50;opacity:0;pointer-events:none;transition:opacity .28s;backdrop-filter:blur(4px)}
-.overlay.show{opacity:1;pointer-events:all}
-.drawer{
-  position:fixed;bottom:0;left:0;right:0;
-  background:var(--bg2);
-  border-radius:22px 22px 0 0;
-  z-index:51;
-  transform:translateY(100%);
-  transition:transform .32s cubic-bezier(.32,.72,0,1);
-  max-height:88vh;
-  overflow:hidden;
-  display:flex;flex-direction:column;
-}
-.drawer.show{transform:translateY(0)}
-.drawer-handle-wrap{padding:10px 0 4px;flex-shrink:0;cursor:pointer}
-.drawer-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto}
-
-/* RENDER IMAGE */
-.drawer-img-wrap{flex-shrink:0;position:relative;height:200px;overflow:hidden;background:var(--bg3)}
-.drawer-img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity .3s}
-.drawer-img.loading{opacity:0}
-.drawer-img-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
-.drawer-img-placeholder svg{opacity:.2}
-.drawer-img-placeholder span{font-size:11px;color:var(--text3)}
-.drawer-img-badge{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:3px 8px;font-size:10px;color:rgba(255,255,255,0.6);backdrop-filter:blur(4px)}
-
-/* DRAWER CONTENT */
-.drawer-scroll{flex:1;overflow-y:auto;padding:16px 20px 32px;scrollbar-width:none}
-.drawer-scroll::-webkit-scrollbar{display:none}
-.dw-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
-.dw-accent{width:28px;height:3px;border-radius:2px;margin-bottom:8px}
-.dw-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:2px;line-height:1.2}
-.dw-type{font-size:11px;color:var(--text2);letter-spacing:.3px}
-.dw-close{width:30px;height:30px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:-2px;transition:all .2s}
-.dw-close:active{opacity:.7}
-
-/* STATS GRID */
-.dw-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.dw-cell{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:11px 13px}
-.dw-cell-lbl{font-size:9px;color:var(--text3);letter-spacing:.8px;margin-bottom:4px;text-transform:uppercase;font-weight:500}
-.dw-cell-val{font-size:15px;font-weight:500;line-height:1.2}
-
-/* FEATURES */
-.dw-features{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.dw-feat{display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:5px 10px}
-.dw-feat-icon{font-size:13px}
-.dw-feat-txt{font-size:11px;color:var(--text2)}
-
-/* DESC */
-.dw-desc{font-size:13px;color:var(--text2);line-height:1.7;border-top:1px solid var(--border);padding-top:12px}
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- LOADING -->
 <div class="fullscreen" id="screen-loading">
   <div class="spinner"></div>
   <div class="fs-title">Yuklanmoqda</div>
   <div class="fs-sub" id="loading-msg">Ma'lumotlar olinmoqda...</div>
 </div>
 
-<!-- ERROR -->
 <div class="fullscreen" id="screen-error" style="display:none">
   <div style="font-size:32px;margin-bottom:12px">⚠️</div>
   <div class="fs-title" id="err-title">Xatolik</div>
@@ -140,10 +23,7 @@ canvas{position:absolute;top:0;left:0;touch-action:none}
   <button class="ubtn" onclick="location.reload()">Qayta urinish</button>
 </div>
 
-<!-- VIEWER -->
 <div id="viewer">
-
-  <!-- TOPBAR -->
   <div class="topbar">
     <div class="tb-row1">
       <div class="brand-pill" id="brand-name">ARCHVIEW</div>
@@ -152,7 +32,10 @@ canvas{position:absolute;top:0;left:0;touch-action:none}
     <div class="tb-row2">
       <div class="owner-row">
         <div class="owner-av">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
         </div>
         <span class="owner-txt" id="owner-name">—</span>
       </div>
@@ -163,7 +46,6 @@ canvas{position:absolute;top:0;left:0;touch-action:none}
     </div>
   </div>
 
-  <!-- TOOLBAR -->
   <div class="toolbar">
     <div class="floor-tabs" id="floor-tabs"></div>
     <div class="vtoggle" id="vtoggle" style="display:none">
@@ -172,37 +54,34 @@ canvas{position:absolute;top:0;left:0;touch-action:none}
     </div>
   </div>
 
-  <!-- CANVAS -->
   <div class="canvas-area" id="canvas-area">
     <canvas id="cv"></canvas>
     <div class="zoom-hint" id="zoom-hint">✦ ikki barmoq — kattalashtirish</div>
   </div>
 
-  <!-- ROOM STRIP -->
   <div class="room-strip" id="room-strip"></div>
-
 </div>
 
-<!-- OVERLAY -->
 <div class="overlay" id="overlay" onclick="closeDrawer()"></div>
 
-<!-- DRAWER -->
 <div class="drawer" id="drawer">
   <div class="drawer-handle-wrap" onclick="closeDrawer()">
     <div class="drawer-handle"></div>
   </div>
-
-  <!-- RENDER RASM -->
   <div class="drawer-img-wrap" id="drawer-img-wrap">
     <div class="drawer-img-placeholder" id="drawer-img-placeholder">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21 15 16 10 5 21"/>
+      </svg>
       <span>Render rasm yo'q</span>
     </div>
-    <img id="drawer-img" class="drawer-img loading" alt="render" onload="this.classList.remove('loading')" onerror="this.style.display='none'">
+    <img id="drawer-img" class="drawer-img loading" alt="render"
+      onload="this.classList.remove('loading')"
+      onerror="this.style.display='none'">
     <div class="drawer-img-badge" id="drawer-img-badge" style="display:none">RENDER</div>
   </div>
-
-  <!-- CONTENT -->
   <div class="drawer-scroll">
     <div class="dw-header">
       <div>
@@ -212,504 +91,20 @@ canvas{position:absolute;top:0;left:0;touch-action:none}
       </div>
       <button class="dw-close" onclick="closeDrawer()">×</button>
     </div>
-
-    <!-- STATS -->
     <div class="dw-grid">
-      <div class="dw-cell">
-        <div class="dw-cell-lbl">Maydon</div>
-        <div class="dw-cell-val" id="dw-area" style="color:var(--accent)">—</div>
-      </div>
-      <div class="dw-cell">
-        <div class="dw-cell-lbl">O'lcham</div>
-        <div class="dw-cell-val" id="dw-size">—</div>
-      </div>
-      <div class="dw-cell">
-        <div class="dw-cell-lbl">Deraza</div>
-        <div class="dw-cell-val" id="dw-win">—</div>
-      </div>
-      <div class="dw-cell">
-        <div class="dw-cell-lbl">Eshik</div>
-        <div class="dw-cell-val" id="dw-door">—</div>
-      </div>
+      <div class="dw-cell"><div class="dw-cell-lbl">Maydon</div><div class="dw-cell-val" id="dw-area">—</div></div>
+      <div class="dw-cell"><div class="dw-cell-lbl">O'lcham</div><div class="dw-cell-val" id="dw-size">—</div></div>
+      <div class="dw-cell"><div class="dw-cell-lbl">Deraza</div><div class="dw-cell-val" id="dw-win">—</div></div>
+      <div class="dw-cell"><div class="dw-cell-lbl">Eshik</div><div class="dw-cell-val" id="dw-door">—</div></div>
     </div>
-
-    <!-- FEATURES -->
     <div class="dw-features" id="dw-features"></div>
-
-    <!-- DESC -->
     <div class="dw-desc" id="dw-desc"></div>
+
+    <!-- XARITA -->
+    <div id="dw-map-wrap" style="display:none;margin-top:14px;border-radius:12px;overflow:hidden;height:220px;border:1px solid var(--border)"></div>
   </div>
 </div>
 
-<script>
-const ISO_X=0.866,ISO_Y=0.5,WALL_H_BASE=36,UNIT_BASE=52;
-let UNIT=UNIT_BASE,WALL_H=WALL_H_BASE;
-let allFloors=[],rooms=[],currentFloorIdx=0;
-let selected=null,hovered=null,viewMode='2.5d',isPremium=false;
-let panX=0,panY=0,scale=1;
-let isPanning=false,lastTouch={x:0,y:0},lastPinchDist=0,touchStartPos={x:0,y:0};
-const dpr=Math.min(devicePixelRatio||1,2);
-const cv=document.getElementById('cv');
-const ctx=cv.getContext('2d');
-
-// ---- SCREENS ----
-function showScreen(id){
-  ['screen-loading','screen-error','viewer'].forEach(s=>{
-    document.getElementById(s).style.display=s===id?(s==='viewer'?'flex':'flex'):'none';
-  });
-}
-function showError(t,m,d=''){
-  document.getElementById('err-title').textContent=t;
-  document.getElementById('err-msg').textContent=m;
-  const det=document.getElementById('err-detail');
-  if(d){det.textContent=d;det.style.display='block';}else det.style.display='none';
-  showScreen('screen-error');
-}
-
-// ---- INIT ----
-async function init(){
-  const id=new URLSearchParams(location.search).get('id');
-  if(!id){showError("ID ko'rsatilmagan","URL misoli:","sayt.vercel.app/?id=abdullayev-047");return;}
-  document.getElementById('loading-msg').textContent='manifest.json yuklanmoqda...';
-  let project=null;
-  try{
-    const res=await fetch('/manifest.json');
-    if(!res.ok)throw new Error('HTTP '+res.status);
-    const manifest=await res.json();
-    project=manifest[id];
-    if(!project){showError('"'+id+'" topilmadi','Mavjud loyihalar:',Object.keys(manifest).join('\n'));return;}
-  }catch(e){showError('manifest.json yuklanmadi','','Xato: '+e.message);return;}
-
-  applyBrand(project);
-  isPremium=project.premium||false;
-  document.getElementById('loading-msg').textContent='"'+project.name+'" yuklanmoqda...';
-
-  try{
-    let data=null;
-    try{
-      const res=await fetch(project.url);
-      if(res.status===401||res.status===403)throw new Error('PERM');
-      if(!res.ok)throw new Error('HTTP '+res.status);
-      data=await res.json();
-    }catch(e){
-      const p='https://api.allorigins.win/raw?url='+encodeURIComponent(project.url);
-      const r2=await fetch(p);
-      if(!r2.ok)throw new Error('CORS');
-      data=await r2.json();
-    }
-    renderProject(data,project);
-  }catch(e){
-    showError("Yuklab bo'lmadi","Firebase Rules:\nallow read: if true;",'Xato: '+e.message);
-  }
-}
-
-// ---- BRAND ----
-function applyBrand(p){
-  const b=p.brand||{};
-  if(b.color)document.documentElement.style.setProperty('--accent',b.color);
-  if(b.company)document.getElementById('brand-name').textContent=b.company.toUpperCase();
-}
-
-// ---- RENDER PROJECT ----
-function renderProject(data,project){
-  allFloors=data.floors&&data.floors.length>0
-    ?data.floors:[{id:'f1',label:'Reja',rooms:data.rooms||[]}];
-  document.getElementById('proj-name').textContent=data.name||project.name||'—';
-  document.getElementById('owner-name').textContent=project.owner||'—';
-  document.getElementById('s-area').textContent=data.totalArea||'—';
-  const total=allFloors.reduce((s,f)=>s+(f.rooms||[]).length,0);
-  document.getElementById('s-rooms').textContent=total;
-  buildFloorTabs();
-  if(isPremium)document.getElementById('vtoggle').style.display='flex';
-  switchFloor(0);
-  showScreen('viewer');
-  setTimeout(()=>{resizeCanvas();fitToScreen();},80);
-}
-
-// ---- FLOORS ----
-function buildFloorTabs(){
-  const tabs=document.getElementById('floor-tabs');
-  tabs.innerHTML='';
-  if(allFloors.length<=1){tabs.style.display='none';return;}
-  allFloors.forEach((f,i)=>{
-    const btn=document.createElement('button');
-    btn.className='ftab'+(i===0?' active':'');
-    btn.textContent=f.label||('Qavat '+(i+1));
-    btn.onclick=()=>switchFloor(i);
-    tabs.appendChild(btn);
-  });
-}
-function switchFloor(idx){
-  currentFloorIdx=idx;rooms=allFloors[idx].rooms||[];
-  selected=null;hovered=null;
-  document.querySelectorAll('.ftab').forEach((t,i)=>t.classList.toggle('active',i===idx));
-  closeDrawer();buildRoomStrip();fitToScreen();draw();
-}
-
-// ---- VIEW ----
-function setView(mode){
-  viewMode=mode;
-  document.getElementById('btn-25d').classList.toggle('active',mode==='2.5d');
-  document.getElementById('btn-2d').classList.toggle('active',mode==='2d');
-  fitToScreen();draw();
-}
-
-// ---- ROOM STRIP ----
-function buildRoomStrip(){
-  const strip=document.getElementById('room-strip');
-  strip.innerHTML='';
-  rooms.forEach(r=>{
-    const el=document.createElement('div');
-    el.className='rchip';el.id='chip-'+r.id;
-    el.innerHTML=`<div class="rchip-dot" style="background:${r.color}"></div>
-      <div class="rchip-name">${r.name}</div>
-      <div class="rchip-area">${r.area}</div>`;
-    el.onclick=()=>selectRoom(r.id);
-    strip.appendChild(el);
-  });
-}
-
-// ---- DRAWER ----
-function openDrawer(r){
-  // Render rasm
-  const imgEl=document.getElementById('drawer-img');
-  const placeholder=document.getElementById('drawer-img-placeholder');
-  const badge=document.getElementById('drawer-img-badge');
-  const wrap=document.getElementById('drawer-img-wrap');
-
-  if(r.render){
-    imgEl.src=r.render;
-    imgEl.classList.add('loading');
-    imgEl.style.display='block';
-    placeholder.style.display='none';
-    badge.style.display='block';
-    wrap.style.height='200px';
-  } else {
-    imgEl.style.display='none';
-    placeholder.style.display='flex';
-    badge.style.display='none';
-    wrap.style.height='80px';
-  }
-
-  // Accent rang
-  document.getElementById('dw-accent').style.background=r.color;
-  document.getElementById('dw-area').style.color=r.color;
-
-  // Ma'lumotlar
-  document.getElementById('dw-name').textContent=r.name;
-  document.getElementById('dw-type').textContent=r.type;
-  document.getElementById('dw-area').textContent=r.area;
-  document.getElementById('dw-size').textContent=r.size;
-  document.getElementById('dw-win').textContent=r.windows;
-  document.getElementById('dw-door').textContent=r.doors;
-  document.getElementById('dw-desc').textContent=r.desc||'';
-
-  // Features (ixtiyoriy qo'shimcha atributlar)
-  const feats=document.getElementById('dw-features');
-  feats.innerHTML='';
-  const defaultFeats=[
-    {icon:'☀️',txt:r.windows+' deraza'},
-    {icon:'🚪',txt:r.doors+' eshik'},
-  ];
-  if(r.features&&r.features.length){
-    r.features.forEach(f=>{
-      feats.innerHTML+=`<div class="dw-feat"><span class="dw-feat-icon">${f.icon||'•'}</span><span class="dw-feat-txt">${f.text}</span></div>`;
-    });
-  } else {
-    defaultFeats.forEach(f=>{
-      feats.innerHTML+=`<div class="dw-feat"><span class="dw-feat-icon">${f.icon}</span><span class="dw-feat-txt">${f.txt}</span></div>`;
-    });
-  }
-
-  document.getElementById('drawer').classList.add('show');
-  document.getElementById('overlay').classList.add('show');
-}
-
-function closeDrawer(){
-  document.getElementById('drawer').classList.remove('show');
-  document.getElementById('overlay').classList.remove('show');
-}
-
-function selectRoom(id){
-  selected=id;
-  document.querySelectorAll('.rchip').forEach(el=>el.classList.remove('active'));
-  document.getElementById('chip-'+id)?.classList.add('active');
-  document.getElementById('chip-'+id)?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
-  const r=rooms.find(x=>x.id===id);
-  if(r)openDrawer(r);
-  draw();
-}
-
-// ================================================================
-// DRAW
-// ================================================================
-function wh(){return WALL_H*scale;}
-function toIso(gx,gy){return{x:panX+(gx-gy)*UNIT*scale*ISO_X,y:panY+(gx+gy)*UNIT*scale*ISO_Y};}
-function toFlat(gx,gy){return{x:panX+gx*UNIT*scale,y:panY+gy*UNIT*scale};}
-
-function draw(){
-  const W=cv.width/dpr,H=cv.height/dpr;
-  ctx.clearRect(0,0,cv.width,cv.height);
-  ctx.fillStyle='#0a0a0b';ctx.fillRect(0,0,cv.width,cv.height);
-
-  // Grid
-  ctx.strokeStyle='rgba(255,255,255,0.018)';ctx.lineWidth=.5;
-  for(let i=0;i<=14;i++){
-    const a=viewMode==='2d'?toFlat(i,0):toIso(i,0);
-    const b=viewMode==='2d'?toFlat(i,12):toIso(i,12);
-    const off=viewMode==='2d'?0:wh();
-    ctx.beginPath();ctx.moveTo(a.x,a.y+off);ctx.lineTo(b.x,b.y+off);ctx.stroke();
-  }
-  for(let j=0;j<=12;j++){
-    const a=viewMode==='2d'?toFlat(0,j):toIso(0,j);
-    const b=viewMode==='2d'?toFlat(14,j):toIso(14,j);
-    const off=viewMode==='2d'?0:wh();
-    ctx.beginPath();ctx.moveTo(a.x,a.y+off);ctx.lineTo(b.x,b.y+off);ctx.stroke();
-  }
-
-  [...rooms].sort((a,b)=>(a.gx+a.gy)-(b.gx+b.gy)).forEach(r=>{
-    if(viewMode==='2d')draw2D(r,r.id===hovered,r.id===selected);
-    else draw25D(r,r.id===hovered,r.id===selected);
-  });
-}
-
-// ---- 2.5D ----
-function draw25D(r,isHov,isSel){
-  const{gx,gy,gw,gh}=r;
-  const lift=(isSel?8:isHov?4:0)*scale;
-  const al=isSel?'ff':isHov?'ee':'cc';
-  const p00=toIso(gx,gy),p10=toIso(gx+gw,gy),p11=toIso(gx+gw,gy+gh),p01=toIso(gx,gy+gh);
-  const poly=(pts,fill,stroke,lw)=>{
-    ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
-    ctx.closePath();ctx.fillStyle=fill;ctx.fill();
-    if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw||1;ctx.stroke();}
-  };
-  const L=p=>({x:p.x,y:p.y-lift});
-  const T=p=>({x:p.x,y:p.y-lift-wh()});
-  const sc=isSel?r.color+'cc':null;
-
-  poly([L(p00),L(p10),L(p11),L(p01)],r.floor+al,sc,1.2);
-  poly([L(p01),L(p11),{x:p11.x,y:p11.y-lift+wh()},{x:p01.x,y:p01.y-lift+wh()}],r.wallLeft+al,sc,.8);
-  poly([L(p10),L(p11),{x:p11.x,y:p11.y-lift+wh()},{x:p10.x,y:p10.y-lift+wh()}],r.wallRight+al,sc,.8);
-  poly([T(p00),T(p10),T(p11),T(p01)],r.wallTop+al,sc,.8);
-
-  [p00,p10,p11,p01].forEach(p=>{
-    ctx.beginPath();ctx.moveTo(p.x,p.y-lift-wh());ctx.lineTo(p.x,p.y-lift);
-    ctx.strokeStyle='rgba(0,0,0,0.25)';ctx.lineWidth=.6*scale;ctx.stroke();
-  });
-
-  // Deraza
-  const w1=toIso(gx+gw*.15,gy),w2=toIso(gx+gw*.85,gy);
-  ctx.beginPath();
-  ctx.moveTo(w1.x,w1.y-lift-wh()*.15);ctx.lineTo(w1.x,w1.y-lift-wh()*.85);
-  ctx.lineTo(w2.x,w2.y-lift-wh()*.85);ctx.lineTo(w2.x,w2.y-lift-wh()*.15);
-  ctx.strokeStyle='rgba(86,180,211,0.5)';ctx.lineWidth=1.5*scale;ctx.stroke();
-  ctx.fillStyle='rgba(86,180,211,0.08)';ctx.fill();
-
-  // Label
-  const cx=(p00.x+p10.x+p11.x+p01.x)/4;
-  const cy=(p00.y+p10.y+p11.y+p01.y)/4-lift;
-  const fs=Math.max(7,Math.min(12,UNIT*scale*.16));
-  ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.font=`600 ${fs}px Syne,sans-serif`;
-  ctx.fillStyle=isSel?'#fff':'rgba(255,255,255,0.82)';
-  ctx.fillText(r.name,cx,cy-fs*.65);
-  ctx.font=`300 ${fs*.82}px Outfit,sans-serif`;
-  ctx.fillStyle=isSel?r.color:'rgba(255,255,255,0.38)';
-  ctx.fillText(r.area,cx,cy+fs*.72);
-  ctx.restore();
-}
-
-// ---- 2D ----
-function draw2D(r,isHov,isSel){
-  const{gx,gy,gw,gh}=r;
-  const p00=toFlat(gx,gy),p10=toFlat(gx+gw,gy),p11=toFlat(gx+gw,gy+gh),p01=toFlat(gx,gy+gh);
-  const al=isSel?.2:isHov?.12:.06;
-  ctx.beginPath();[p00,p10,p11,p01].forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
-  ctx.closePath();
-  ctx.fillStyle=r.color+(Math.round(al*255).toString(16).padStart(2,'0'));ctx.fill();
-  ctx.strokeStyle=isSel?r.color:r.color+'55';ctx.lineWidth=isSel?2*scale:scale;ctx.stroke();
-  ctx.strokeStyle='rgba(240,237,230,0.6)';ctx.lineWidth=3*scale;
-  [[p00,p10],[p10,p11],[p11,p01],[p01,p00]].forEach(([a,b])=>{ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();});
-  const wx=UNIT*scale*gw*.22;
-  ctx.strokeStyle='rgba(86,180,211,0.85)';ctx.lineWidth=3*scale;
-  ctx.beginPath();ctx.moveTo(p00.x+wx,p00.y);ctx.lineTo(p10.x-wx,p10.y);ctx.stroke();
-  // eshik yoyi
-  const dw=UNIT*scale*.8;
-  ctx.beginPath();ctx.moveTo(p01.x,p01.y);ctx.lineTo(p01.x,p01.y-dw);
-  ctx.strokeStyle='rgba(200,160,80,0.7)';ctx.lineWidth=1.5*scale;ctx.stroke();
-  ctx.beginPath();ctx.arc(p01.x,p01.y,dw,Math.PI*1.5,Math.PI*2);
-  ctx.setLineDash([3*scale,2*scale]);ctx.stroke();ctx.setLineDash([]);
-  // label
-  const cx=(p00.x+p11.x)/2,cy=(p00.y+p11.y)/2;
-  const fs=Math.max(7,Math.min(12,UNIT*scale*.16));
-  ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.font=`600 ${fs}px Syne,sans-serif`;
-  ctx.fillStyle=isSel?'#fff':'rgba(255,255,255,0.82)';ctx.fillText(r.name,cx,cy-fs*.65);
-  ctx.font=`300 ${fs*.82}px Outfit,sans-serif`;
-  ctx.fillStyle=isSel?r.color:'rgba(255,255,255,0.38)';ctx.fillText(r.area,cx,cy+fs*.72);
-  ctx.restore();
-  // jihozlar
-  if(r.furniture)r.furniture.forEach(f=>drawFurniture(f,r.color));
-}
-
-// ---- JIHOZLAR ----
-function drawFurniture(f,rc){
-  const u=UNIT*scale;
-  const x=panX+f.x*u,y=panY+f.y*u,fw=f.w*u,fh=f.h*u;
-  ctx.save();ctx.strokeStyle=rc+'88';ctx.fillStyle=rc+'1a';ctx.lineWidth=scale;
-  if(f.type==='bed'){
-    ctx.beginPath();ctx.roundRect(x,y,fw,fh,3*scale);ctx.fill();ctx.stroke();
-    ctx.fillStyle=rc+'33';ctx.beginPath();ctx.roundRect(x,y,fw,fh*.18,2*scale);ctx.fill();ctx.stroke();
-    ctx.fillStyle=rc+'2a';
-    ctx.beginPath();ctx.roundRect(x+fw*.08,y+fh*.06,fw*.38,fh*.28,2*scale);ctx.fill();ctx.stroke();
-    ctx.beginPath();ctx.roundRect(x+fw*.54,y+fh*.06,fw*.38,fh*.28,2*scale);ctx.fill();ctx.stroke();
-  } else if(f.type==='sofa'){
-    ctx.beginPath();ctx.roundRect(x,y,fw,fh,3*scale);ctx.fill();ctx.stroke();
-    ctx.fillStyle=rc+'33';ctx.beginPath();ctx.roundRect(x,y,fw,fh*.28,2*scale);ctx.fill();ctx.stroke();
-    ctx.fillStyle=rc+'22';
-    const sw=fw/3;
-    for(let i=0;i<3;i++){ctx.beginPath();ctx.roundRect(x+i*sw+scale,y+fh*.32,sw-2*scale,fh*.65,2*scale);ctx.fill();}
-  } else if(f.type==='table'){
-    ctx.beginPath();ctx.roundRect(x,y,fw,fh,2*scale);ctx.fill();ctx.stroke();
-    ctx.fillStyle=rc+'44';const leg=2.5*scale;
-    [[x+leg,y+leg],[x+fw-leg*2,y+leg],[x+leg,y+fh-leg*2],[x+fw-leg*2,y+fh-leg*2]].forEach(([lx,ly])=>{ctx.beginPath();ctx.roundRect(lx,ly,leg,leg,1);ctx.fill();});
-  } else if(f.type==='chair'){
-    ctx.beginPath();ctx.roundRect(x,y,fw,fh,3*scale);ctx.fill();ctx.stroke();
-    ctx.fillStyle=rc+'33';ctx.beginPath();ctx.roundRect(x,y,fw,fh*.22,2*scale);ctx.fill();
-  } else if(f.type==='wardrobe'){
-    ctx.beginPath();ctx.roundRect(x,y,fw,fh,2*scale);ctx.fill();ctx.stroke();
-    ctx.beginPath();ctx.moveTo(x+fw/2,y);ctx.lineTo(x+fw/2,y+fh);ctx.strokeStyle=rc+'55';ctx.lineWidth=scale;ctx.stroke();
-    [[x+fw*.25,y+fh/2],[x+fw*.75,y+fh/2]].forEach(([hx,hy])=>{ctx.beginPath();ctx.arc(hx,hy,2*scale,0,Math.PI*2);ctx.fillStyle=rc+'88';ctx.fill();});
-  } else if(f.type==='kitchen'){
-    ctx.beginPath();ctx.roundRect(x,y,fw,fh,2*scale);ctx.fill();ctx.stroke();
-    const r2=fw*.11;
-    [[.25,.3],[.65,.3],[.25,.7],[.65,.7]].forEach(([rx,ry])=>{ctx.beginPath();ctx.arc(x+fw*rx,y+fh*ry,r2,0,Math.PI*2);ctx.strokeStyle=rc+'66';ctx.lineWidth=scale;ctx.stroke();});
-  } else if(f.type==='bathtub'){
-    ctx.beginPath();ctx.roundRect(x,y,fw,fh,5*scale);ctx.fill();ctx.stroke();
-    ctx.fillStyle='rgba(86,180,211,0.15)';ctx.beginPath();ctx.ellipse(x+fw/2,y+fh/2,fw*.38,fh*.35,0,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle='rgba(86,180,211,0.4)';ctx.stroke();
-  } else if(f.type==='wc'){
-    ctx.beginPath();ctx.ellipse(x+fw/2,y+fh*.6,fw*.42,fh*.38,0,0,Math.PI*2);ctx.fill();ctx.stroke();
-    ctx.beginPath();ctx.roundRect(x+fw*.1,y,fw*.8,fh*.35,3*scale);ctx.fill();ctx.stroke();
-  } else if(f.type==='sink'){
-    ctx.beginPath();ctx.roundRect(x,y,fw,fh,3*scale);ctx.fill();ctx.stroke();
-    ctx.fillStyle='rgba(86,180,211,0.18)';ctx.beginPath();ctx.ellipse(x+fw/2,y+fh/2,fw*.34,fh*.34,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle=rc+'88';ctx.beginPath();ctx.arc(x+fw/2,y+fh/2,1.8*scale,0,Math.PI*2);ctx.fill();
-  }
-  ctx.restore();
-}
-
-// ---- FIT ----
-function fitToScreen(){
-  if(!rooms.length)return;
-  const area=document.getElementById('canvas-area');
-  const W=area.clientWidth,H=area.clientHeight;
-  const maxGx=Math.max(...rooms.map(r=>r.gx+r.gw));
-  const maxGy=Math.max(...rooms.map(r=>r.gy+r.gh));
-  if(viewMode==='2d'){
-    const sx=(W-32)/(maxGx*UNIT),sy=(H-32)/(maxGy*UNIT);
-    scale=Math.min(sx,sy,1.8);
-    panX=(W-maxGx*UNIT*scale)/2;panY=(H-maxGy*UNIT*scale)/2;
-  } else {
-    const isoW=(maxGx+maxGy)*UNIT*ISO_X;
-    const isoH=(maxGx+maxGy)*UNIT*ISO_Y+WALL_H+20;
-    const sx=(W-32)/isoW,sy=(H-50)/isoH;
-    scale=Math.min(sx,sy,1.8);
-    panX=W/2-(maxGy-maxGx)*UNIT*scale*ISO_X/2;
-    panY=(H-isoH*scale)/2+8;
-  }
-  draw();
-}
-
-// ---- CANVAS ----
-function resizeCanvas(){
-  const area=document.getElementById('canvas-area');
-  const W=area.clientWidth,H=area.clientHeight;
-  cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
-  cv.style.width=W+'px';cv.style.height=H+'px';
-  ctx.setTransform(1,0,0,1,0,0);ctx.scale(dpr,dpr);
-}
-
-// ---- HIT TEST ----
-function getPos(e){const rect=cv.getBoundingClientRect();const t=e.touches?e.touches[0]:e;return{x:t.clientX-rect.left,y:t.clientY-rect.top};}
-function hitTest(px,py){
-  for(let i=rooms.length-1;i>=0;i--){
-    const r=rooms[i];let pts;
-    if(viewMode==='2d'){pts=[toFlat(r.gx,r.gy),toFlat(r.gx+r.gw,r.gy),toFlat(r.gx+r.gw,r.gy+r.gh),toFlat(r.gx,r.gy+r.gh)];}
-    else{
-      const lift=(r.id===selected?8:0)*scale;
-      const fp=[toIso(r.gx,r.gy),toIso(r.gx+r.gw,r.gy),toIso(r.gx+r.gw,r.gy+r.gh),toIso(r.gx,r.gy+r.gh)];
-      const tp=fp.map(p=>({x:p.x,y:p.y-lift-wh()}));
-      if(polyHit(px,py,fp)||polyHit(px,py,tp))return r.id;continue;
-    }
-    if(polyHit(px,py,pts))return r.id;
-  }
-  return null;
-}
-function polyHit(px,py,pts){
-  let inside=false;
-  for(let a=0,b=pts.length-1;a<pts.length;b=a++){
-    const xi=pts[a].x,yi=pts[a].y,xj=pts[b].x,yj=pts[b].y;
-    if(((yi>py)!=(yj>py))&&(px<(xj-xi)*(py-yi)/(yj-yi)+xi))inside=!inside;
-  }
-  return inside;
-}
-
-// ---- TOUCH ----
-const ca=document.getElementById('canvas-area');
-ca.addEventListener('touchstart',e=>{
-  e.preventDefault();
-  if(e.touches.length===2){
-    lastPinchDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
-    isPanning=false;
-    document.getElementById('zoom-hint').style.opacity='0';
-  } else if(e.touches.length===1){
-    isPanning=true;
-    lastTouch={x:e.touches[0].clientX,y:e.touches[0].clientY};
-    touchStartPos={x:e.touches[0].clientX,y:e.touches[0].clientY};
-  }
-},{passive:false});
-
-ca.addEventListener('touchmove',e=>{
-  e.preventDefault();
-  if(e.touches.length===2){
-    const dist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
-    const delta=dist/lastPinchDist;
-    const rect=ca.getBoundingClientRect();
-    const mx=(e.touches[0].clientX+e.touches[1].clientX)/2-rect.left;
-    const my=(e.touches[0].clientY+e.touches[1].clientY)/2-rect.top;
-    panX=(panX-mx)*delta+mx;panY=(panY-my)*delta+my;
-    scale=Math.max(0.25,Math.min(5,scale*delta));
-    lastPinchDist=dist;draw();
-  } else if(e.touches.length===1&&isPanning){
-    panX+=e.touches[0].clientX-lastTouch.x;
-    panY+=e.touches[0].clientY-lastTouch.y;
-    lastTouch={x:e.touches[0].clientX,y:e.touches[0].clientY};draw();
-  }
-},{passive:false});
-
-ca.addEventListener('touchend',e=>{
-  if(e.changedTouches.length===1&&isPanning&&e.touches.length===0){
-    const dx=Math.abs(e.changedTouches[0].clientX-touchStartPos.x);
-    const dy=Math.abs(e.changedTouches[0].clientY-touchStartPos.y);
-    if(dx<8&&dy<8){
-      const rect=ca.getBoundingClientRect();
-      const x=e.changedTouches[0].clientX-rect.left,y=e.changedTouches[0].clientY-rect.top;
-      const h=hitTest(x,y);
-      if(h)selectRoom(h);
-      else{selected=null;document.querySelectorAll('.rchip').forEach(el=>el.classList.remove('active'));closeDrawer();draw();}
-    }
-  }
-  isPanning=false;
-},{passive:false});
-
-cv.addEventListener('mousemove',e=>{const{x,y}=getPos(e);const h=hitTest(x,y);if(h!==hovered){hovered=h;draw();}cv.style.cursor=h?'pointer':'default';});
-cv.addEventListener('mouseleave',()=>{hovered=null;draw();});
-cv.addEventListener('click',e=>{const{x,y}=getPos(e);const h=hitTest(x,y);if(h)selectRoom(h);else{selected=null;document.querySelectorAll('.rchip').forEach(el=>el.classList.remove('active'));closeDrawer();draw();}});
-ca.addEventListener('wheel',e=>{e.preventDefault();const rect=ca.getBoundingClientRect();const mx=e.clientX-rect.left,my=e.clientY-rect.top;const d=e.deltaY>0?.88:1.14;panX=(panX-mx)*d+mx;panY=(panY-my)*d+my;scale=Math.max(0.25,Math.min(5,scale*d));draw();},{passive:false});
-window.addEventListener('resize',()=>{resizeCanvas();fitToScreen();});
-init();
-</script>
+<script src="app.js"></script>
 </body>
 </html>
