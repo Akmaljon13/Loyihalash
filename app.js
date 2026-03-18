@@ -413,16 +413,16 @@ function initMap(){
     maxZoom:20
   });
 
-  // Esri World Imagery — bepul, token yo'q, zoom 20
+  // Google Satellite — bepul, token yo'q, zoom 21
   L.tileLayer(
-    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    {maxZoom:20,tileSize:256}
+    'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+    {maxZoom:21,maxNativeZoom:21,tileSize:256}
   ).addTo(_map);
 
   // Ko'cha nomlari overlay
   L.tileLayer(
-    'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
-    {maxZoom:20,opacity:0.6}
+    'https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}',
+    {maxZoom:21,maxNativeZoom:21,opacity:0.7}
   ).addTo(_map);
 
   if(loc.polygon&&loc.polygon.length>=3){
