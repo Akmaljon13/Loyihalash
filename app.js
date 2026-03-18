@@ -83,9 +83,14 @@ function renderProject(data,project){
   setTimeout(()=>{resizeCanvas();fitToScreen();},80);
 }
 
+// ---- DRAWER CLOSE — oldin e'lon qilinadi ----
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('show');
+  document.getElementById('overlay').classList.remove('show');
+}
+
 // ---- FLOORS ----
-function buildFloorTabs(){
-  const tabs=document.getElementById('floor-tabs');
+function buildFloorTabs(){  const tabs=document.getElementById('floor-tabs');
   tabs.innerHTML='';
   if(allFloors.length<=1){tabs.style.display='none';return;}
   allFloors.forEach((f,i)=>{
