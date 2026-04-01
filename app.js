@@ -185,40 +185,150 @@ function draw(){
   });
 }
 
+// hex rangni rgb ga o'girish
+function hexToRgb(hex){
+  const r=parseInt(hex.slice(1,3),16);
+  const g=parseInt(hex.slice(3,5),16);
+  const b=parseInt(hex.slice(5,7),16);
+  return{r,g,b};
+}
+// rang + alpha string
+function rgba(hex,a){const{r,g,b}=hexToRgb(hex);return`rgba(${r},${g},${b},${a})`;}
+// rangni to'qlashtirish (qop-qora tomonga)
+function darken(hex,amt){
+  const{r,g,b}=hexToRgb(hex);
+  return`rgb(${Math.max(0,r-amt)},${Math.max(0,g-amt)},${Math.max(0,b-amt)})`;
+}
+// rangni yoritish
+function lighten(hex,amt){
+  const{r,g,b}=hexToRgb(hex);
+  return`rgb(${Math.min(255,r+amt)},${Math.min(255,g+amt)},${Math.min(255,b+amt)})`;
+}
+
 function draw25D(r,isHov,isSel){
   const{gx,gy,gw,gh}=r;
-  const lift=(isSel?8:isHov?4:0)*scale;
-  const al=isSel?'ff':isHov?'ee':'cc';
+  const lift=(isSel?10:isHov?5:0)*scale;
   const p00=toIso(gx,gy),p10=toIso(gx+gw,gy),p11=toIso(gx+gw,gy+gh),p01=toIso(gx,gy+gh);
-  const poly=(pts,fill,stroke,lw)=>{
+
+  const drawPoly=(pts,fill,stroke,lw,shadow)=>{
     ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
-    ctx.closePath();ctx.fillStyle=fill;ctx.fill();
+    ctx.closePath();
+    if(shadow){ctx.shadowColor=shadow;ctx.shadowBlur=12*scale;ctx.shadowOffsetY=4*scale;}
+    ctx.fillStyle=fill;ctx.fill();
+    ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;
     if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw||1;ctx.stroke();}
   };
+
   const L=p=>({x:p.x,y:p.y-lift});
   const T=p=>({x:p.x,y:p.y-lift-wh()});
-  const sc=isSel?r.color+'cc':null;
-  poly([L(p00),L(p10),L(p11),L(p01)],r.floor+al,sc,1.2);
-  poly([L(p01),L(p11),{x:p11.x,y:p11.y-lift+wh()},{x:p01.x,y:p01.y-lift+wh()}],r.wallLeft+al,sc,.8);
-  poly([L(p10),L(p11),{x:p11.x,y:p11.y-lift+wh()},{x:p10.x,y:p10.y-lift+wh()}],r.wallRight+al,sc,.8);
-  poly([T(p00),T(p10),T(p11),T(p01)],r.wallTop+al,sc,.8);
+
+  // --- TAVAN (yuqori yuz) — eng yorqin ---
+  const topAlpha   = isSel?0.98:isHov?0.92:0.82;
+  const topColor   = isSel ? lighten(r.color,30) : isHov ? lighten(r.color,15) : r.color;
+  drawPoly(
+    [T(p00),T(p10),T(p11),T(p01)],
+    rgba(r.color, topAlpha),
+    isSel ? lighten(r.color,60) : lighten(r.color,30),
+    isSel?2:1,
+    isSel ? r.color : null
+  );
+
+  // Tavan gradient effekti
+  const tavGrad=ctx.createLinearGradient(T(p00).x,T(p00).y,T(p11).x,T(p11).y);
+  tavGrad.addColorStop(0, rgba(r.color, 0.0));
+  tavGrad.addColorStop(0.5, `rgba(255,255,255,${isSel?0.18:0.10})`);
+  tavGrad.addColorStop(1, rgba(r.color, 0.0));
+  ctx.beginPath();[T(p00),T(p10),T(p11),T(p01)].forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+  ctx.closePath();ctx.fillStyle=tavGrad;ctx.fill();
+
+  // --- CHAP DEVOR (quyiroq ton) ---
+  const wallLAlpha = isSel?0.85:isHov?0.75:0.65;
+  const wallLColor = darken(r.color, isSel?30:50);
+  drawPoly(
+    [L(p01),L(p11),{x:p11.x,y:p11.y-lift+wh()},{x:p01.x,y:p01.y-lift+wh()}],
+    wallLColor,
+    rgba(r.color, 0.4),
+    0.8
+  );
+
+  // --- O'NG DEVOR (o'rta ton) ---
+  const wallRColor = darken(r.color, isSel?15:30);
+  drawPoly(
+    [L(p10),L(p11),{x:p11.x,y:p11.y-lift+wh()},{x:p10.x,y:p10.y-lift+wh()}],
+    wallRColor,
+    rgba(r.color, 0.4),
+    0.8
+  );
+
+  // --- POL (eng to'q) ---
+  drawPoly(
+    [L(p00),L(p10),L(p11),L(p01)],
+    darken(r.color, 80),
+    rgba(r.color,0.2),
+    0.6
+  );
+
+  // --- BURCHAK CHIZIQLARI ---
   [p00,p10,p11,p01].forEach(p=>{
-    ctx.beginPath();ctx.moveTo(p.x,p.y-lift-wh());ctx.lineTo(p.x,p.y-lift);
-    ctx.strokeStyle='rgba(0,0,0,0.25)';ctx.lineWidth=.6*scale;ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(p.x,p.y-lift-wh());
+    ctx.lineTo(p.x,p.y-lift);
+    ctx.strokeStyle=rgba(r.color,0.35);
+    ctx.lineWidth=1*scale;
+    ctx.stroke();
   });
-  const w1=toIso(gx+gw*.15,gy),w2=toIso(gx+gw*.85,gy);
+
+  // --- DERAZA (tavan yuzida) ---
+  const w1=toIso(gx+gw*.18,gy),w2=toIso(gx+gw*.82,gy);
+  const wy1h=wh()*.12, wy2h=wh()*.82;
   ctx.beginPath();
-  ctx.moveTo(w1.x,w1.y-lift-wh()*.15);ctx.lineTo(w1.x,w1.y-lift-wh()*.85);
-  ctx.lineTo(w2.x,w2.y-lift-wh()*.85);ctx.lineTo(w2.x,w2.y-lift-wh()*.15);
-  ctx.strokeStyle='rgba(86,180,211,0.5)';ctx.lineWidth=1.5*scale;ctx.stroke();
-  ctx.fillStyle='rgba(86,180,211,0.08)';ctx.fill();
-  const cx=(p00.x+p10.x+p11.x+p01.x)/4,cy=(p00.y+p10.y+p11.y+p01.y)/4-lift;
-  const fs=Math.max(7,Math.min(12,UNIT*scale*.16));
-  ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.font=`600 ${fs}px Syne,sans-serif`;
-  ctx.fillStyle=isSel?'#fff':'rgba(255,255,255,0.82)';ctx.fillText(r.name,cx,cy-fs*.65);
-  ctx.font=`300 ${fs*.82}px Outfit,sans-serif`;
-  ctx.fillStyle=isSel?r.color:'rgba(255,255,255,0.38)';ctx.fillText(r.area,cx,cy+fs*.72);
+  ctx.moveTo(w1.x,w1.y-lift-wy1h);
+  ctx.lineTo(w1.x,w1.y-lift-wy2h);
+  ctx.lineTo(w2.x,w2.y-lift-wy2h);
+  ctx.lineTo(w2.x,w2.y-lift-wy1h);
+  ctx.closePath();
+  ctx.fillStyle=`rgba(180,230,255,0.12)`;
+  ctx.fill();
+  ctx.strokeStyle=`rgba(180,230,255,0.7)`;
+  ctx.lineWidth=1.5*scale;
+  ctx.stroke();
+  // Deraza krest
+  const wmx=(w1.x+w2.x)/2;
+  const wmyt=w1.y-lift-wy2h, wmyb=w1.y-lift-wy1h;
+  ctx.beginPath();
+  ctx.moveTo(wmx,wmyt);ctx.lineTo(wmx,wmyb);
+  ctx.moveTo(w1.x,wmyt+(wmyb-wmyt)/2);ctx.lineTo(w2.x,wmyt+(wmyb-wmyt)/2);
+  ctx.strokeStyle=`rgba(180,230,255,0.45)`;
+  ctx.lineWidth=scale;ctx.stroke();
+
+  // --- YORQIN CHIZIQ (tavan qirrasi) ---
+  ctx.beginPath();
+  ctx.moveTo(T(p00).x,T(p00).y);ctx.lineTo(T(p10).x,T(p10).y);
+  ctx.lineTo(T(p11).x,T(p11).y);ctx.lineTo(T(p01).x,T(p01).y);
+  ctx.closePath();
+  ctx.strokeStyle=lighten(r.color,70);
+  ctx.lineWidth=(isSel?2.5:1.5)*scale;
+  ctx.stroke();
+
+  // --- MATN ---
+  const cx=(T(p00).x+T(p10).x+T(p11).x+T(p01).x)/4;
+  const cy=(T(p00).y+T(p10).y+T(p11).y+T(p01).y)/4;
+  const fs=Math.max(7,Math.min(13,UNIT*scale*.17));
+  ctx.save();
+  ctx.textAlign='center';ctx.textBaseline='middle';
+
+  // Matn soyasi
+  ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=6;
+
+  ctx.font=`700 ${fs}px Syne,sans-serif`;
+  ctx.fillStyle='#ffffff';
+  ctx.fillText(r.name,cx,cy-fs*.7);
+
+  ctx.font=`400 ${fs*.85}px Outfit,sans-serif`;
+  ctx.fillStyle=isSel?'#fff':lighten(r.color,60);
+  ctx.fillText(r.area,cx,cy+fs*.65);
+
+  ctx.shadowBlur=0;
   ctx.restore();
 }
 
