@@ -1,6 +1,6 @@
 {
   "abdullayev-047": {
-    "url": "https://firebasestorage.googleapis.com/v0/b/agrosuv-a2a3a.firebasestorage.app/o/autocad%2Fabdullayev%20-047%2Fdata%20(1).json?alt=media&token=2248b36c-c172-4ed5-8cb4-246e82a4b5be",
+    "url": "YOUR_FIREBASE_URL_HERE/data.json?alt=media&token=YOUR_TOKEN",
     "name": "Abdullayev oilasi uyi",
     "owner": "Abdullayev Jasur Xolmatovich",
     "address": "Toshkent viloyati · Loyiha №047",
@@ -9,36 +9,17 @@
     "premium": true,
     "location": {
       "polygon": [
-        [40.710125, 68.699983],
-        [40.709933, 68.700039],
-        [40.709969, 68.700319],
-        [40.710161, 68.700269]
+        [40.71012821840234, 68.69997653053667],
+        [40.71016326686546, 68.70027876216658],
+        [40.70995725002511, 68.70004644979433],
+        [40.71000341153022, 68.70032387136507]
       ],
-      "center": [40.710047, 68.700153],
-      "zoom": 18
+      "center": [40.71006, 68.70015],
+      "zoom": 19
     },
     "brand": {
       "company": "GeoProekt",
       "color": "#e8c97a",
-      "logo": ""
-    }
-  },
-  "karimov-048": {
-    "url": "https://firebasestorage.googleapis.com/v0/b/agrosuv-a2a3a.firebasestorage.app/o/autocad%2Fkarimov-048%2Fdata.json?alt=media&token=eac7ea97-d224-4842-b49f-a5aed0719652",
-    "name": "Karimov oilasi uyi",
-    "owner": "Karimov Bobur Aliyevich",
-    "address": "Samarqand shahri · Loyiha №048",
-    "status": "ready",
-    "createdAt": "2024-01-18",
-    "premium": true,
-    "location": {
-      "lat": 39.654100,
-      "lng": 66.975200,
-      "zoom": 17
-    },
-    "brand": {
-      "company": "ArchStudio",
-      "color": "#56b4d3",
       "logo": ""
     }
   }
