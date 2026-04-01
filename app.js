@@ -397,7 +397,7 @@ ca.addEventListener('wheel',e=>{e.preventDefault();const rect=ca.getBoundingClie
 window.addEventListener('resize',()=>{resizeCanvas();fitToScreen();});
 
 // ================================================================
-// MAP — Esri Satellite (bepul, max zoom 20)
+// MAP — Google Satellite
 // ================================================================
 function initMap(){
   _mapInited=true;
@@ -410,16 +410,14 @@ function initMap(){
   _map=L.map('leaflet-map',{
     center,zoom:loc.zoom||18,
     zoomControl:true,attributionControl:false,
-    maxZoom:20
+    maxZoom:21
   });
 
-  // Google Satellite — bepul, token yo'q, zoom 21
   L.tileLayer(
     'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
     {maxZoom:21,maxNativeZoom:21,tileSize:256}
   ).addTo(_map);
 
-  // Ko'cha nomlari overlay
   L.tileLayer(
     'https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}',
     {maxZoom:21,maxNativeZoom:21,opacity:0.7}
@@ -449,27 +447,61 @@ function createOverlay(loc){
 
 function redrawOverlay(){
   if(!_svgEl||!_map||!window._overlayPoly||!rooms.length) return;
-  const bounds=window._overlayBounds,poly=window._overlayPoly;
+
+  const bounds=window._overlayBounds;
+  const poly=window._overlayPoly;
+
   const tl=_map.latLngToLayerPoint([bounds[1][0],bounds[0][1]]);
   const br=_map.latLngToLayerPoint([bounds[0][0],bounds[1][1]]);
   const W=br.x-tl.x,H=br.y-tl.y;
   _svgEl.setAttribute('viewBox',`0 0 ${W} ${H}`);
   _svgEl.innerHTML='';
-  const maxGx=Math.max(...rooms.map(r=>r.gx+r.gw));
-  const maxGy=Math.max(...rooms.map(r=>r.gy+r.gh));
-  function toSVG(lat,lng){const pt=_map.latLngToLayerPoint([lat,lng]);return{x:pt.x-tl.x,y:pt.y-tl.y};}
-  function gridToGeo(gx,gy){
-    const tx=gx/maxGx,ty=gy/maxGy,p=poly;
-    const tLat=p[0][0]+(p[3][0]-p[0][0])*tx,tLng=p[0][1]+(p[3][1]-p[0][1])*tx;
-    const bLat=p[1][0]+(p[2][0]-p[1][0])*tx,bLng=p[1][1]+(p[2][1]-p[1][1])*tx;
-    return[tLat+(bLat-tLat)*ty,tLng+(bLng-tLng)*ty];
+
+  // Faqat 1-qavat xonalarini olish (currentFloorIdx=0)
+  const floorRooms = allFloors[0] ? allFloors[0].rooms : rooms;
+  if(!floorRooms||!floorRooms.length) return;
+
+  const maxGx=Math.max(...floorRooms.map(r=>r.gx+r.gw));
+  const maxGy=Math.max(...floorRooms.map(r=>r.gy+r.gh));
+
+  function toSVG(lat,lng){
+    const pt=_map.latLngToLayerPoint([lat,lng]);
+    return{x:pt.x-tl.x,y:pt.y-tl.y};
   }
-  rooms.forEach(r=>{
+
+  // ✅ TO'G'RILANGAN gridToGeo:
+  // poly[0] = chap yuqori (shimoli-g'arb)
+  // poly[1] = o'ng yuqori (shimoli-sharq)
+  // poly[2] = o'ng quyi   (janubi-sharq)
+  // poly[3] = chap quyi   (janubi-g'arb)
+  function gridToGeo(gx,gy){
+    const tx = gx / maxGx;
+    const ty = gy / maxGy;
+
+    // Yuqori chiziq: chap yuqori → o'ng yuqori
+    const topLat = poly[0][0] + (poly[1][0] - poly[0][0]) * tx;
+    const topLng = poly[0][1] + (poly[1][1] - poly[0][1]) * tx;
+
+    // Quyi chiziq: chap quyi → o'ng quyi
+    const botLat = poly[3][0] + (poly[2][0] - poly[3][0]) * tx;
+    const botLng = poly[3][1] + (poly[2][1] - poly[3][1]) * tx;
+
+    // Vertikal interpolatsiya (yuqoridan pastga)
+    return [
+      topLat + (botLat - topLat) * ty,
+      topLng + (botLng - topLng) * ty
+    ];
+  }
+
+  floorRooms.forEach(r=>{
     const isSel=r.id===selected;
     const pts=[
-      gridToGeo(r.gx,r.gy),gridToGeo(r.gx+r.gw,r.gy),
-      gridToGeo(r.gx+r.gw,r.gy+r.gh),gridToGeo(r.gx,r.gy+r.gh)
+      gridToGeo(r.gx,      r.gy),
+      gridToGeo(r.gx+r.gw, r.gy),
+      gridToGeo(r.gx+r.gw, r.gy+r.gh),
+      gridToGeo(r.gx,      r.gy+r.gh)
     ].map(([lat,lng])=>toSVG(lat,lng));
+
     const ptStr=pts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
     const pg=document.createElementNS('http://www.w3.org/2000/svg','polygon');
     pg.setAttribute('points',ptStr);
